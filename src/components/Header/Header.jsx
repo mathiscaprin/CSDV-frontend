@@ -11,8 +11,10 @@ export default function Header({ sups, supsPerSecond, rankName, username, onLogo
 
       <div className="score-block">
         <div className="score-label">Vos Sups</div>
-        <div className="score-value">{fmt(sups)} 🎓</div>
-        <div className="score-cps">+{fmt(supsPerSecond)} sups/sec</div>
+        <div className="score-row">
+          <div className="score-value">{fmt(sups)} 🎓</div>
+          <div className="score-cps">+{fmt(supsPerSecond)} sups/sec</div>
+        </div>
       </div>
 
       <Profile username={username} rankName={rankName} onLogout={onLogout} onSave={onSave} saveStatus={saveStatus} />

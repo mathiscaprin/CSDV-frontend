@@ -1,6 +1,6 @@
 export const INITIAL_UPGRADES = [
   // ── CPC ──────────────────────────────────────────────────────────
-  { id: 0, name: 'Doigt de développeur',     icon: '👆', baseCost: 10,          cpc: 1,    cps: 0,     owned: 1, desc: '+1 sup par clic' },
+  { id: 0, name: 'Doigt de développeur',     icon: '👆', baseCost: 10,          cpc: 1,    cps: 0,     owned: 1, growthRate: 1.5, desc: '+1 sup par clic' },
 
   // ── TIER 1 — premiers outils (déblocage ~30s) ────────────────────
   { id: 1,  name: 'Café',            icon: '☕', baseCost: 15,           cpc: 0,    cps: 0.2,   owned: 0, desc: '+0.2 sup/sec' },
@@ -31,5 +31,6 @@ export const INITIAL_UPGRADES = [
 ]
 
 export function getUpgradeCost(upgrade) {
-  return Math.floor(upgrade.baseCost * Math.pow(1.15, upgrade.owned))
+  const growthRate = upgrade.growthRate ?? 1.15
+  return Math.floor(upgrade.baseCost * Math.pow(growthRate, upgrade.owned))
 }
