@@ -1,8 +1,8 @@
 .upgrades-section { width: 100%; }
 
 .section-eyebrow {
-  font-size: 10px;
-  color: #7c3aed;
+  font-size: 12px;
+  color: #ede9fe;
   letter-spacing: 3px;
   text-transform: uppercase;
   font-weight: 700;
@@ -12,17 +12,17 @@
 .upgrades-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .upgrade-card {
   display: flex;
   align-items: center;
   gap: 14px;
-  padding: 14px 18px;
-  background: rgba(255,255,255,0.025);
-  border: 1px solid rgba(139, 92, 246, 0.15);
-  border-radius: 14px;
+  padding: 16px 20px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 16px;
   cursor: pointer;
   transition: all 0.18s ease;
   position: relative;
@@ -74,25 +74,25 @@
 .upgrade-info { flex: 1; min-width: 0; }
 
 .upgrade-name {
-  font-weight: 700;
-  font-size: 14px;
-  color: #e9d5ff;
-  margin-bottom: 3px;
+  font-weight: 800;
+  font-size: 16px;
+  color: #f8f7ff;
+  margin-bottom: 4px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .upgrade-stats {
-  font-size: 12px;
-  color: #7c3aed;
-  font-weight: 500;
+  font-size: 13px;
+  color: #d8b4fe;
+  font-weight: 600;
 }
 
 .upgrade-owned-count {
-  font-size: 11px;
-  color: rgba(109,40,217,0.7);
-  margin-top: 2px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.78);
+  margin-top: 4px;
 }
 
 .upgrade-right {
@@ -101,14 +101,14 @@
 }
 
 .upgrade-cost-val {
-  font-weight: 800;
-  font-size: 16px;
-  color: #a78bfa;
+  font-weight: 900;
+  font-size: 18px;
+  color: #ede9fe;
 }
 
 .upgrade-cost-unit {
-  font-size: 10px;
-  color: #6d28d9;
+  font-size: 11px;
+  color: #d8b4fe;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
