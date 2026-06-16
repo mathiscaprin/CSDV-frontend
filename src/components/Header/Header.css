@@ -126,3 +126,10 @@
   background: rgba(139, 92, 246, 0.28);
   color: #ffffff;
 }
+
+.profile-note {
+  margin-top: 10px;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 12px;
+  line-height: 1.4;
+}
