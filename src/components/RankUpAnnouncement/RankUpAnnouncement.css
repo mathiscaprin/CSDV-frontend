@@ -1,0 +1,32 @@
+.rank-announcement-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.rank-announcement-card {
+  font-size: clamp(28px, 6vw, 48px);
+  font-weight: 800;
+  color: #fff;
+  background: linear-gradient(135deg, #8b5cf6, #c4b5f4);
+  padding: 20px 44px;
+  border-radius: 24px;
+  box-shadow: 0 0 50px rgba(139, 92, 246, 0.7);
+  text-align: center;
+  white-space: nowrap;
+  opacity: 0;
+  animation: rank-pop 2.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes rank-pop {
+  0% { transform: translateY(70px) scale(0.4) rotate(-6deg); opacity: 0; }
+  35% { transform: translateY(-8px) scale(1.12) rotate(4deg); opacity: 1; }
+  50% { transform: translateY(0) scale(0.96) rotate(-2deg); opacity: 1; }
+  65% { transform: translateY(0) scale(1.05) rotate(1deg); opacity: 1; }
+  80% { transform: translateY(0) scale(1) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(-20px) scale(0.85) rotate(0deg); opacity: 0; }
+}
