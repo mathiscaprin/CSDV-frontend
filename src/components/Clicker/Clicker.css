@@ -34,8 +34,7 @@
     inset 0 2px 8px rgba(255,255,255,0.3);
 }
 
-.logo-btn:active, .logo-btn.clicked {
-  transform: scale(0.87);
+.logo-btn:active {
   box-shadow: 0 0 24px rgba(139, 92, 246, 0.3);
 }
 
