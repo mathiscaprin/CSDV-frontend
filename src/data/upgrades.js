@@ -1,6 +1,6 @@
 export const INITIAL_UPGRADES = [
   // ── CPC ──────────────────────────────────────────────────────────
-  { id: 0, name: 'Doigt de développeur',     icon: '👆', baseCost: 10,          cpc: 1,    cps: 0,     owned: 0, desc: '+1 sup par clic' },
+  { id: 0, name: 'Doigt de développeur',     icon: '👆', baseCost: 10,          cpc: 1,    cps: 0,     owned: 1, desc: '+1 sup par clic' },
 
   // ── TIER 1 — premiers outils (déblocage ~30s) ────────────────────
   { id: 1,  name: 'Café',            icon: '☕', baseCost: 15,           cpc: 0,    cps: 0.2,   owned: 0, desc: '+0.2 sup/sec' },

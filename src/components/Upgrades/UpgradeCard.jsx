@@ -16,6 +16,11 @@ export default function UpgradeCard({ upgrade, cost, canAfford, onBuy }) {
     setFlash(true)
   }
 
+  const isCps = upgrade.cps > 0
+  const base = isCps ? upgrade.cps : upgrade.cpc
+  const unit = isCps ? 'sups/sec' : 'sups/clic'
+  const total = upgrade.owned * base
+
   return (
     <div
       className={`upgrade-card${canAfford ? ' affordable' : ' cant-afford'}${flash ? ' bought-flash' : ''}`}
@@ -24,8 +29,8 @@ export default function UpgradeCard({ upgrade, cost, canAfford, onBuy }) {
       <div className="upgrade-icon">{upgrade.icon}</div>
       <div className="upgrade-info">
         <div className="upgrade-name">{upgrade.name}</div>
-        <div className="upgrade-stats">{upgrade.desc}</div>
-        <div className="upgrade-owned-count">Possédé : {upgrade.owned}</div>
+        <div className="upgrade-stats">Total : +{fmt(total)} {unit}</div>
+        <div className="upgrade-owned-count">Possédé : {upgrade.owned} · Base : +{fmt(base)} {unit}</div>
       </div>
       <div className="upgrade-right">
         <div className="upgrade-cost-val">{fmt(cost)}</div>
