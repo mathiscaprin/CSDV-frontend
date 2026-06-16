@@ -7,6 +7,9 @@ export default function LoginPage({ onLogin }) {
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [message, setMessage] = useState(null)
   const [loading, setLoading] = useState(false)
 
@@ -17,6 +20,9 @@ export default function LoginPage({ onLogin }) {
 
     try {
       if (mode === 'register') {
+        if (password !== confirmPassword) {
+          throw new Error('Les mots de passe ne correspondent pas.')
+        }
         const signUpResponse = await signUp(username.trim(), email.trim(), password)
         if (!signUpResponse.ok) {
           if (signUpResponse.status === 409) {
@@ -111,17 +117,83 @@ export default function LoginPage({ onLogin }) {
 
           <div className="auth-field">
             <label htmlFor="password">Mot de passe</label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              placeholder="••••••••••"
-              autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-              required
-              minLength={6}
-            />
+            <div className="password-wrapper">
+              <input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                placeholder="••••••••••"
+                autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                required
+                minLength={6}
+              />
+              <button
+                type="button"
+                className="password-toggle"
+                onMouseDown={() => setShowPassword(true)}
+                onMouseUp={() => setShowPassword(false)}
+                onMouseLeave={() => setShowPassword(false)}
+                onTouchStart={() => setShowPassword(true)}
+                onTouchEnd={() => setShowPassword(false)}
+                onTouchCancel={() => setShowPassword(false)}
+                aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+              >
+                {showPassword ? (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 2l20 20" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-6 0-10-7-10-7a21.48 21.48 0 0 1 5.06-4.94" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                ) : (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.5" />
+                  </svg>
+                )}
+              </button>
+            </div>
           </div>
+
+          {mode === 'register' && (
+            <div className="auth-field">
+              <label htmlFor="confirmPassword">Confirmer le mot de passe</label>
+              <div className="password-wrapper">
+                <input
+                  id="confirmPassword"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  value={confirmPassword}
+                  onChange={(event) => setConfirmPassword(event.target.value)}
+                  placeholder="••••••••••"
+                  autoComplete="new-password"
+                  required
+                  minLength={6}
+                />
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onMouseDown={() => setShowConfirmPassword(true)}
+                  onMouseUp={() => setShowConfirmPassword(false)}
+                  onMouseLeave={() => setShowConfirmPassword(false)}
+                  onTouchStart={() => setShowConfirmPassword(true)}
+                  onTouchEnd={() => setShowConfirmPassword(false)}
+                  onTouchCancel={() => setShowConfirmPassword(false)}
+                  aria-label={showConfirmPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
+                >
+                  {showConfirmPassword ? (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M2 2l20 20" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M17.94 17.94A10.94 10.94 0 0 1 12 19c-6 0-10-7-10-7a21.48 21.48 0 0 1 5.06-4.94" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  ) : (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.5" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
 
           <div className="auth-actions">
             <button className="auth-cta" type="submit" disabled={loading}>

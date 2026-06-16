@@ -80,6 +80,39 @@
   font-size: 1rem;
 }
 
+.password-wrapper {
+  position: relative;
+}
+
+.auth-field input[type="password"], .auth-field input[type="text"] {
+  /* reserve space for the visibility toggle */
+  padding-right: 48px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: #e9d5ff;
+  padding: 6px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  z-index: 3;
+}
+
+.password-toggle svg {
+  display: block;
+}
+
+.password-toggle:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(167, 139, 250, 0.12);
+}
+
 .auth-field input:focus {
   outline: none;
   border-color: rgba(167, 139, 250, 0.7);
