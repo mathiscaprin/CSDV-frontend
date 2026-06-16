@@ -4,28 +4,28 @@
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  margin-bottom: 10px;
+  margin-bottom: 14px;
 }
 
 .current-rank {
-  font-size: 14px;
-  font-weight: 700;
-  color: #a78bfa;
+  font-size: 16px;
+  font-weight: 800;
+  color: #ede9fe;
   letter-spacing: 1px;
 }
 
 .next-rank-info {
-  font-size: 11px;
-  color: #6d28d9;
+  font-size: 13px;
+  color: #d8b4fe;
 }
 
 .progress-bar-bg {
   width: 100%;
-  height: 12px;
-  background: rgba(255,255,255,0.05);
+  height: 14px;
+  background: rgba(255,255,255,0.12);
   border-radius: 99px;
   overflow: hidden;
-  border: 1px solid rgba(139, 92, 246, 0.2);
+  border: 1px solid rgba(255,255,255,0.18);
 }
 
 .progress-bar-fill {
@@ -58,8 +58,8 @@
 }
 
 .rank-labels span {
-  font-size: 9px;
-  color: rgba(109, 40, 217, 0.6);
+  font-size: 11px;
+  color: rgba(255,255,255,0.75);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
