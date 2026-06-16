@@ -1,5 +1,5 @@
 export const INITIAL_UPGRADES = [
-  { id: 0, name: 'Doigt de fée', icon: '👆', baseCost: 10, cpc: 1, cps: 0, owned: 0, desc: '+1 sup par clic' },
+  { id: 0, name: 'Doigt de fée', icon: '👆', baseCost: 10, cpc: 1, cps: 1000, owned: 0, desc: '+1 sup par clic' },
   { id: 1, name: 'Java', icon: '☕', baseCost: 100, cpc: 0, cps: 1, owned: 0, desc: '+1 sup/sec' },
   { id: 2, name: 'C++', icon: '⚙️', baseCost: 500, cpc: 0, cps: 5, owned: 0, desc: '+5 sups/sec' },
   { id: 3, name: 'Python', icon: '🐍', baseCost: 2000, cpc: 0, cps: 20, owned: 0, desc: '+20 sups/sec' },
