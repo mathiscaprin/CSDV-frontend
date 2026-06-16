@@ -8,14 +8,14 @@
 }
 
 .current-rank {
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 800;
   color: #ede9fe;
   letter-spacing: 1px;
 }
 
 .next-rank-info {
-  font-size: 13px;
+  font-size: 16px;
   color: #d8b4fe;
 }
 

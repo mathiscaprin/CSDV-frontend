@@ -7,8 +7,8 @@
 }
 
 .logo-btn {
-  width: 220px;
-  height: 220px;
+  width: 20rem;
+  height: 20rem;
   border-radius: 50%;
   background: radial-gradient(circle at 35% 35%, #f8f2ff, #d8b4fe 40%, #7c3aed 100%);
   border: 3px solid rgba(167, 139, 250, 0.7);
@@ -39,7 +39,7 @@
 }
 
 .logo-text {
-  font-size: 52px;
+  font-size: 65px;
   font-weight: 900;
   color: #1b0f4c;
   letter-spacing: -2px;
@@ -48,7 +48,7 @@
 }
 
 .logo-text sup {
-  font-size: 20px;
+  font-size: 25px;
   color: #6d28d9;
   vertical-align: super;
   font-weight: 900;

@@ -5,7 +5,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 18px 32px;
+  padding: 1.4rem 4rem;
   border-bottom: 1px solid rgba(139, 92, 246, 0.35);
   background: rgba(10, 6, 30, 0.95);
   backdrop-filter: blur(16px);
@@ -25,7 +25,18 @@
 .header-brand span { color: #ede9fe; }
 
 .score-block {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   text-align: center;
+}
+
+.score-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 10px;
 }
 
 .score-label {
@@ -48,7 +59,7 @@
 .score-cps {
   font-size: 13px;
   color: #c4b5f4;
-  margin-top: 4px;
+  white-space: nowrap;
 }
 
 /* Profile */
