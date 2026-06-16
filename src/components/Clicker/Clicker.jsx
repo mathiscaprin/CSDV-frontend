@@ -23,16 +23,25 @@ export default function Clicker({ onClick }) {
     }, 860)
   }
 
+  function handleRightClick(e) {
+    e.preventDefault()
+    handleClick(e)
+  }
+
   return (
     <div className="clicker-wrapper">
-      <div className={`logo-btn${clicked ? ' clicked' : ''}`} onClick={handleClick}>
+      <div
+        className={`logo-btn${clicked ? ' clicked' : ''}`}
+        onClick={handleClick}
+        onContextMenu={handleRightClick}
+      >
         <div className="logo-text">
           SUP<sup>2</sup>
           <br />
           VINCI
         </div>
       </div>
-      <div className="logo-hint">Cliquez pour gagner des sups</div>
+      <div className="logo-hint">Clic gauche ou clic droit pour gagner des sups (butterfly click 🦋)</div>
 
       {floats.map((f) => (
         <div
