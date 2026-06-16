@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 
-export default function Profile({ rankName }) {
+export default function Profile({ username, rankName, onLogout, onSave, saveStatus }) {
   const [open, setOpen] = useState(false)
   const wrapperRef = useRef(null)
 
@@ -20,10 +20,24 @@ export default function Profile({ rankName }) {
         👤
       </div>
       <div className={`profile-dropdown${open ? ' open' : ''}`}>
-        <div className="profile-username">sylvain_g</div>
+        <div className="profile-username">{username || 'Invité'}</div>
         <div className="profile-rank-badge">{rankName}</div>
         <div className="divider"></div>
-        <button className="logout-btn">🚪 Se déconnecter</button>
+        <button
+          className="logout-btn"
+          type="button"
+          onClick={(event) => { event.stopPropagation(); onSave?.() }}
+        >
+          💾 Sauvegarder
+        </button>
+        <button
+          className="logout-btn"
+          type="button"
+          onClick={(event) => { event.stopPropagation(); onLogout?.() }}
+        >
+          🚪 Se déconnecter
+        </button>
+        {saveStatus ? <div className="profile-note">{saveStatus}</div> : null}
       </div>
     </div>
   )

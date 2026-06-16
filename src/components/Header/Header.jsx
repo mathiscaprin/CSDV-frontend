@@ -2,7 +2,7 @@ import Profile from './Profile.jsx'
 import { fmt } from '../../utils/format.js'
 import './Header.css'
 
-export default function Header({ sups, supsPerSecond, rankName }) {
+export default function Header({ sups, supsPerSecond, rankName, username, onLogout, onSave, saveStatus }) {
   return (
     <header className="header">
       <div className="header-brand">
@@ -15,7 +15,7 @@ export default function Header({ sups, supsPerSecond, rankName }) {
         <div className="score-cps">+{fmt(supsPerSecond)} sups/sec</div>
       </div>
 
-      <Profile rankName={rankName} />
+      <Profile username={username} rankName={rankName} onLogout={onLogout} onSave={onSave} saveStatus={saveStatus} />
     </header>
   )
 }

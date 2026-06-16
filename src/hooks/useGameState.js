@@ -1,14 +1,30 @@
 import { useEffect, useRef, useState } from 'react'
 import { INITIAL_UPGRADES, getUpgradeCost } from '../data/upgrades.js'
 
-export function useGameState() {
-  const [sups, setSups] = useState(0)
-  const [totalSups, setTotalSups] = useState(0)
-  const [supsPerClick, setSupsPerClick] = useState(1)
-  const [supsPerSecond, setSupsPerSecond] = useState(0)
-  const [upgrades, setUpgrades] = useState(INITIAL_UPGRADES)
+export function useGameState(initialState = {}) {
+  const {
+    sups: initialSups = 0,
+    totalSups: initialTotalSups = 0,
+    supsPerClick: initialSupsPerClick = 1,
+    supsPerSecond: initialSupsPerSecond = 0,
+    upgrades: initialUpgrades = INITIAL_UPGRADES,
+  } = initialState
+
+  const [sups, setSups] = useState(initialSups)
+  const [totalSups, setTotalSups] = useState(initialTotalSups)
+  const [supsPerClick, setSupsPerClick] = useState(initialSupsPerClick)
+  const [supsPerSecond, setSupsPerSecond] = useState(initialSupsPerSecond)
+  const [upgrades, setUpgrades] = useState(initialUpgrades)
   const supsPerSecondRef = useRef(supsPerSecond)
   supsPerSecondRef.current = supsPerSecond
+
+  useEffect(() => {
+    setSups(initialSups)
+    setTotalSups(initialTotalSups)
+    setSupsPerClick(initialSupsPerClick)
+    setSupsPerSecond(initialSupsPerSecond)
+    setUpgrades(initialUpgrades)
+  }, [initialSups, initialTotalSups, initialSupsPerClick, initialSupsPerSecond, initialUpgrades])
 
   useEffect(() => {
     const interval = setInterval(() => {
