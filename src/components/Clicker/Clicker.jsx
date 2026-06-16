@@ -3,17 +3,34 @@ import './Clicker.css'
 
 let nextFloatId = 0
 
+// Keyframes are restarted (cancel + replay) on every click so rapid spam-clicking
+// keeps showing the full grow/shrink punch instead of getting stuck mid-animation.
+const PULSE_KEYFRAMES = [
+  { transform: 'scale(1)' },
+  { transform: 'scale(0.8)', offset: 0.35 },
+  { transform: 'scale(1.08)', offset: 0.7 },
+  { transform: 'scale(1)' },
+]
+
+const PULSE_OPTIONS = {
+  duration: 260,
+  easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+}
+
 export default function Clicker({ onClick }) {
-  const [clicked, setClicked] = useState(false)
   const [floats, setFloats] = useState([])
-  const clickTimeoutRef = useRef(null)
+  const logoRef = useRef(null)
+
+  function pulse() {
+    const node = logoRef.current
+    if (!node) return
+    node.getAnimations().forEach((anim) => anim.cancel())
+    node.animate(PULSE_KEYFRAMES, PULSE_OPTIONS)
+  }
 
   function handleClick(e) {
     const gained = onClick()
-
-    setClicked(true)
-    clearTimeout(clickTimeoutRef.current)
-    clickTimeoutRef.current = setTimeout(() => setClicked(false), 110)
+    pulse()
 
     const id = nextFloatId++
     const float = { id, gained, x: e.clientX - 30, y: e.clientY - 20 }
@@ -31,7 +48,8 @@ export default function Clicker({ onClick }) {
   return (
     <div className="clicker-wrapper">
       <div
-        className={`logo-btn${clicked ? ' clicked' : ''}`}
+        ref={logoRef}
+        className="logo-btn"
         onClick={handleClick}
         onContextMenu={handleRightClick}
       >
@@ -41,8 +59,6 @@ export default function Clicker({ onClick }) {
           VINCI
         </div>
       </div>
-      <div className="logo-hint">Clic gauche ou clic droit pour gagner des sups (butterfly click 🦋)</div>
-
       {floats.map((f) => (
         <div
           key={f.id}
