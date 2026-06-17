@@ -26,15 +26,6 @@ import Toast from "./components/Toast/Toast.jsx";
 import "./App.css";
 
 const USER_STORAGE_KEY = "clicker-sdv-user";
-const DEBUG_SUCCESSES = [
-  {
-    id: "debug-total-sups-100",
-    name: "Test 100 SUPS",
-    description: "Tu as atteint 100 sups_total.",
-    metric: "sups_total",
-    value: 100,
-  },
-];
 
 function loadStoredUser() {
   try {
@@ -181,7 +172,6 @@ export default function App() {
     error: successesError,
   } = useSuccesses(gameMetrics, {
     enabled: Boolean(auth && sessionState),
-    localSuccesses: DEBUG_SUCCESSES,
     token: auth?.token,
     resetKey:
       auth?.userId ??
