@@ -17,10 +17,33 @@ const PULSE_OPTIONS = {
   easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
 }
 
+function playPlop(audioCtxRef) {
+  try {
+    if (!audioCtxRef.current) {
+      audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)()
+    }
+    const ctx = audioCtxRef.current
+    const osc = ctx.createOscillator()
+    const gain = ctx.createGain()
+    osc.connect(gain)
+    gain.connect(ctx.destination)
+    osc.type = 'sine'
+    osc.frequency.setValueAtTime(520, ctx.currentTime)
+    osc.frequency.exponentialRampToValueAtTime(90, ctx.currentTime + 0.12)
+    gain.gain.setValueAtTime(0.35, ctx.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.18)
+    osc.start(ctx.currentTime)
+    osc.stop(ctx.currentTime + 0.18)
+  } catch {
+    // audio non disponible, on ignore
+  }
+}
+
 export default function Clicker({ onClick }) {
   const [floats, setFloats] = useState([])
   const logoRef = useRef(null)
   const clickTimestampsRef = useRef([])
+  const audioCtxRef = useRef(null)
 
   function isThrottled() {
     const now = Date.now()
@@ -39,6 +62,7 @@ export default function Clicker({ onClick }) {
 
   function handleClick(e) {
     if (isThrottled()) return
+    if (e.detail === 0 && e.type !== 'contextmenu') playPlop(audioCtxRef)
     const gained = onClick()
     pulse()
 
