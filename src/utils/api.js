@@ -1,14 +1,14 @@
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? ''
 
-async function request(path, { method = 'GET', body, token } = {}) {
+async function request(path, { method = 'GET', body } = {}) {
   const headers = { 'Content-Type': 'application/json' }
-  if (token) headers.Authorization = `Bearer ${token}`
 
   const response = await fetch(`${API_BASE}${path}`, {
     method,
     headers,
     body: body ? JSON.stringify(body) : undefined,
     mode: 'cors',
+    credentials: 'include',
   })
 
   const text = await response.text()
@@ -36,28 +36,37 @@ export async function signUp(username, email, password) {
   })
 }
 
-export async function createSession(token) {
+export async function createSession() {
   return request('/session', {
     method: 'POST',
-    token,
   })
 }
 
-export async function getSession(token) {
+export async function getSession() {
   return request('/session', {
     method: 'GET',
-    token,
   })
 }
 
-export async function saveSession(sessionState, token) {
+export async function saveSession(sessionState) {
   return request('/session', {
     method: 'PUT',
-    token,
     body: {
       supsTotal: String(sessionState.totalSups),
       supsPerSecond: String(sessionState.supsPerSecond),
       supsPerClick: String(sessionState.supsPerClick),
     },
+  })
+}
+
+export async function getLeaderboard() {
+  return request('/session/classement', {
+    method: 'GET',
+  })
+}
+
+export async function signOut() {
+  return request('/auth/deconnexion', {
+    method: 'POST',
   })
 }

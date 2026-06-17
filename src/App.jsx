@@ -6,19 +6,28 @@ import UpgradesList from './components/Upgrades/UpgradesList.jsx'
 import RankUpAnnouncement from './components/RankUpAnnouncement/RankUpAnnouncement.jsx'
 import Confetti from './components/Confetti/Confetti.jsx'
 import LoginPage from './components/Auth/LoginPage.jsx'
+import Leaderboard from './components/Leaderboard/Leaderboard.jsx'
 import { useGameState } from './hooks/useGameState.js'
 import { getCurrentRank, getNextRank, getProgress } from './utils/ranks.js'
-import { createSession, getSession, saveSession } from './utils/api.js'
+import { createSession, getSession, saveSession, signOut } from './utils/api.js'
 import './App.css'
 
-const STORAGE_KEY = 'clicker-sdv-auth'
+const USER_STORAGE_KEY = 'clicker-sdv-user'
 
-function loadStoredAuth() {
+function loadStoredUser() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
+    const raw = sessionStorage.getItem(USER_STORAGE_KEY)
     return raw ? JSON.parse(raw) : null
   } catch {
     return null
+  }
+}
+
+function saveUser(user) {
+  if (user) {
+    sessionStorage.setItem(USER_STORAGE_KEY, JSON.stringify(user))
+  } else {
+    sessionStorage.removeItem(USER_STORAGE_KEY)
   }
 }
 
@@ -32,7 +41,7 @@ function mapSessionData(session = {}) {
 }
 
 export default function App() {
-  const [auth, setAuth] = useState(loadStoredAuth)
+  const [auth, setAuth] = useState(loadStoredUser)
   const [sessionState, setSessionState] = useState(null)
   const [loadingSession, setLoadingSession] = useState(false)
   const [sessionError, setSessionError] = useState(null)
@@ -67,14 +76,14 @@ export default function App() {
   }, [currentRank])
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(auth))
+    saveUser(auth)
   }, [auth])
 
-  async function loadSession(token) {
+  async function loadSession() {
     setLoadingSession(true)
     setSessionError(null)
 
-    const response = await getSession(token)
+    const response = await getSession()
     if (response.ok) {
       setSessionState(mapSessionData(response.data))
       setLoadingSession(false)
@@ -82,13 +91,13 @@ export default function App() {
     }
 
     if (response.status === 404) {
-      const createResponse = await createSession(token)
+      const createResponse = await createSession()
       if (!createResponse.ok && createResponse.status !== 201) {
         setSessionError('Impossible de créer la session de jeu.')
         setLoadingSession(false)
         return
       }
-      const retry = await getSession(token)
+      const retry = await getSession()
       if (retry.ok) {
         setSessionState(mapSessionData(retry.data))
       } else {
@@ -101,7 +110,7 @@ export default function App() {
     if (response.status === 401) {
       setSessionError('Votre session a expiré. Merci de vous reconnecter.')
       setAuth(null)
-      localStorage.removeItem(STORAGE_KEY)
+      saveUser(null)
       setLoadingSession(false)
       return
     }
@@ -111,15 +120,15 @@ export default function App() {
   }
 
   useEffect(() => {
-    if (!auth?.token) return
-    loadSession(auth.token)
-  }, [auth?.token])
+    if (!auth) return
+    loadSession()
+  }, [auth])
 
   useEffect(() => {
-    if (!auth?.token) return
+    if (!auth) return
     const timeout = setTimeout(async () => {
       try {
-        await saveSession({ totalSups, supsPerSecond, supsPerClick }, auth.token)
+        await saveSession({ totalSups, supsPerSecond, supsPerClick })
         setSaveStatus('Sauvegardé automatiquement')
       } catch {
         setSaveStatus('Erreur de sauvegarde')
@@ -127,7 +136,7 @@ export default function App() {
     }, 2500)
 
     return () => clearTimeout(timeout)
-  }, [auth?.token, totalSups, supsPerSecond, supsPerClick])
+  }, [auth, totalSups, supsPerSecond, supsPerClick])
 
   async function handleLogin(newAuth) {
     setAuth(newAuth)
@@ -136,20 +145,21 @@ export default function App() {
   }
 
   async function handleManualSave() {
-    if (!auth?.token) return
+    if (!auth) return
     try {
-      await saveSession({ totalSups, supsPerSecond, supsPerClick }, auth.token)
+      await saveSession({ totalSups, supsPerSecond, supsPerClick })
       setSaveStatus('Sauvegarde envoyée')
     } catch {
       setSaveStatus('Erreur de sauvegarde')
     }
   }
 
-  function handleLogout() {
+  async function handleLogout() {
+    await signOut()
     setAuth(null)
     setSessionState(null)
     setSaveStatus('')
-    localStorage.removeItem(STORAGE_KEY)
+    saveUser(null)
   }
 
   if (!auth) {
@@ -186,6 +196,8 @@ export default function App() {
 
         <UpgradesList upgrades={upgrades} sups={sups} onBuy={buyUpgrade} />
       </main>
+
+      <Leaderboard />
     </>
   )
 }

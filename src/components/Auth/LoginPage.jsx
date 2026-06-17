@@ -40,12 +40,12 @@ export default function LoginPage({ onLogin }) {
         throw new Error('Impossible de se connecter. Réessayez plus tard.')
       }
 
-      const { token, userId, username: returnedUsername } = signInResponse.data || {}
-      if (!token) {
-        throw new Error('Le serveur n’a pas renvoyé de token de connexion.')
+      const { userId, username: returnedUsername } = signInResponse.data || {}
+      if (!userId) {
+        throw new Error('Le serveur n’a pas renvoyé les informations utilisateur.')
       }
 
-      onLogin({ token, userId, username: returnedUsername || username || email })
+      onLogin({ userId, username: returnedUsername || username || email })
     } catch (error) {
       setMessage(error.message ?? 'Une erreur inconnue est survenue.')
     } finally {
