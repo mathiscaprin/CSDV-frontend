@@ -55,9 +55,9 @@ export async function saveSession(sessionState, token) {
     method: 'PUT',
     token,
     body: {
-      cookiesTotal: String(sessionState.totalSups),
-      cookiesPerSecond: String(sessionState.supsPerSecond),
-      cookiesPerClick: String(sessionState.supsPerClick),
+      supsTotal: String(sessionState.totalSups),
+      supsPerSecond: String(sessionState.supsPerSecond),
+      supsPerClick: String(sessionState.supsPerClick),
     },
   })
 }

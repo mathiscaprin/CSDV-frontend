@@ -24,10 +24,10 @@ function loadStoredAuth() {
 
 function mapSessionData(session = {}) {
   return {
-    sups: Number(session.cookiesTotal) || 0,
-    totalSups: Number(session.cookiesTotal) || 0,
-    supsPerClick: Number(session.cookiesPerClick) || 1,
-    supsPerSecond: Number(session.cookiesPerSecond) || 0,
+    sups: Number(session.supsTotal) || 0,
+    totalSups: Number(session.supsTotal) || 0,
+    supsPerClick: Number(session.supsPerClick) || 1,
+    supsPerSecond: Number(session.supsPerSecond) || 0,
   }
 }
 
