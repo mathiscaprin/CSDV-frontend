@@ -9,8 +9,9 @@ import LoginPage from './components/Auth/LoginPage.jsx'
 import Leaderboard from './components/Leaderboard/Leaderboard.jsx'
 import { useGameState } from './hooks/useGameState.js'
 import { getCurrentRank, getNextRank, getProgress } from './utils/ranks.js'
-import { createSession, getSession, saveSession, saveUpgrades, getUpgrade, getUpgradesBySession } from './utils/api.js'
+import { createSession, getSession, saveSession, saveUpgrades, getUpgrade, getUpgradesBySession, signOut } from './utils/api.js'
 import { INITIAL_UPGRADES } from './data/upgrades.js'
+import Toast from './components/Toast/Toast.jsx'
 import './App.css'
 
 const USER_STORAGE_KEY = 'clicker-sdv-user'
@@ -84,6 +85,9 @@ export default function App() {
   const [loadingSession, setLoadingSession] = useState(false)
   const [sessionError, setSessionError] = useState(null)
   const [saveStatus, setSaveStatus] = useState('')
+  const [autoSaveMsg, setAutoSaveMsg] = useState(null)
+  const [autoSaveKey, setAutoSaveKey] = useState(0)
+  const autoSaveClearRef = useRef(null)
 
   const { sups, totalSups, supsPerClick, supsPerSecond, upgrades, click, buyUpgrade } = useGameState(sessionState || {})
 
@@ -249,7 +253,7 @@ export default function App() {
   }, [auth])
 
   useEffect(() => {
-    if (!auth?.token) return
+    if (!auth) return
 
     let mounted = true
 
@@ -259,21 +263,25 @@ export default function App() {
           (sum, upgrade) => sum + (Number(upgrade.ordreAffichage) === 0 ? Number(upgrade.owned) : 0),
           0,
         )
-        await saveSession({ totalSups: totalSupsRef.current, supsPerSecond: supsPerSecondRef.current, supsPerClick: clickBoosterCount, sups: supsRef.current }, auth.token)
-        await saveUpgrades(upgradesRef.current, auth.token)
-        if (mounted) setSaveStatus('Sauvegardé automatiquement')
+        await saveSession({ totalSups: totalSupsRef.current, supsPerSecond: supsPerSecondRef.current, supsPerClick: clickBoosterCount, sups: supsRef.current })
+        await saveUpgrades(upgradesRef.current)
+        if (!mounted) return
+        clearTimeout(autoSaveClearRef.current)
+        setAutoSaveMsg('Sauvegarde automatique effectuée')
+        setAutoSaveKey((k) => k + 1)
+        autoSaveClearRef.current = setTimeout(() => setAutoSaveMsg(null), 3200)
       } catch {
         if (mounted) setSaveStatus('Erreur de sauvegarde')
       }
     }
 
-    const interval = setInterval(saveAll, 5 * 60 * 1000)
+    const interval = setInterval(saveAll, 2 * 60 * 1000)
 
     return () => {
       mounted = false
       clearInterval(interval)
     }
-  }, [auth?.token])
+  }, [auth])
 
   async function handleLogin(newAuth) {
     setAuth(newAuth)
@@ -318,6 +326,7 @@ export default function App() {
 
       <RankUpAnnouncement rank={rankUp} />
       <Confetti burst={rankUp} />
+      <Toast key={autoSaveKey} message={autoSaveMsg} />
 
       <Header
         sups={sups}
