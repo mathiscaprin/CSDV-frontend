@@ -35,22 +35,37 @@ export default function Leaderboard() {
 
   return (
     <div className="leaderboard">
-      <h3>Classement</h3>
+      <h3
+        tabIndex={0}
+        aria-label="Section classement — les meilleurs joueurs"
+      >
+        Classement
+      </h3>
       <ul className="leaderboard-list">
-        {leaderboard.top10.map((player) => (
-          <li
-            key={`${player.rang}-${player.username}`}
-            className={`leaderboard-item${monRang?.username === player.username ? ' leaderboard-item--me' : ''}`}
-          >
-            <span className="rank">#{player.rang}</span>
-            <span className="username">{player.username}</span>
-            <span className="score">{fmt(player.supsTotal)} SUPS</span>
-          </li>
-        ))}
+        {leaderboard.top10.map((player) => {
+          const isMe = monRang?.username === player.username
+          const label = `Position ${player.rang} : ${player.username}, ${fmt(player.supsTotal)} sups${isMe ? ', c\'est vous' : ''}`
+          return (
+            <li
+              key={`${player.rang}-${player.username}`}
+              className={`leaderboard-item${isMe ? ' leaderboard-item--me' : ''}`}
+              tabIndex={0}
+              aria-label={label}
+            >
+              <span className="rank">#{player.rang}</span>
+              <span className="username">{player.username}</span>
+              <span className="score">{fmt(player.supsTotal)} SUPS</span>
+            </li>
+          )
+        })}
         {monRang && !inTop10 && (
           <>
-            <li className="leaderboard-separator">• • •</li>
-            <li className="leaderboard-item leaderboard-item--me">
+            <li className="leaderboard-separator" aria-hidden="true">• • •</li>
+            <li
+              className="leaderboard-item leaderboard-item--me"
+              tabIndex={0}
+              aria-label={`Votre position : ${monRang.rang}, ${monRang.username}, ${fmt(monRang.supsTotal)} sups`}
+            >
               <span className="rank">#{monRang.rang}</span>
               <span className="username">{monRang.username}</span>
               <span className="score">{fmt(monRang.supsTotal)} SUPS</span>

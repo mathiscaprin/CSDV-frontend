@@ -8,6 +8,7 @@ import Confetti from './components/Confetti/Confetti.jsx'
 import LoginPage from './components/Auth/LoginPage.jsx'
 import Leaderboard from './components/Leaderboard/Leaderboard.jsx'
 import { useGameState } from './hooks/useGameState.js'
+import { useKeyboardSpeech } from './hooks/useKeyboardSpeech.js'
 import { getCurrentRank, getNextRank, getProgress } from './utils/ranks.js'
 import { createSession, getSession, saveSession, saveUpgrades, getUpgrade, getUpgradesBySession, signOut } from './utils/api.js'
 import { INITIAL_UPGRADES } from './data/upgrades.js'
@@ -88,6 +89,25 @@ export default function App() {
   const [autoSaveMsg, setAutoSaveMsg] = useState(null)
   const [autoSaveKey, setAutoSaveKey] = useState(0)
   const autoSaveClearRef = useRef(null)
+
+  useKeyboardSpeech()
+
+  useEffect(() => {
+    function handleBackspace(e) {
+      if (e.key !== 'Backspace') return
+      const tag = document.activeElement?.tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return
+      e.preventDefault()
+      const focusable = Array.from(
+        document.querySelectorAll('button:not([disabled]), [tabindex]:not([tabindex="-1"])')
+      ).filter((el) => el.offsetParent !== null || el.closest('.header') || el.closest('.leaderboard'))
+      const idx = focusable.indexOf(document.activeElement)
+      const prev = idx <= 0 ? focusable[focusable.length - 1] : focusable[idx - 1]
+      prev?.focus()
+    }
+    document.addEventListener('keydown', handleBackspace)
+    return () => document.removeEventListener('keydown', handleBackspace)
+  }, [])
 
   const { sups, totalSups, supsPerClick, supsPerSecond, upgrades, click, buyUpgrade } = useGameState(sessionState || {})
 

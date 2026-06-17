@@ -27,10 +27,16 @@ export default function UpgradeCard({ upgrade, cost, canAfford, onBuy }) {
   const owned = Number(upgrade.owned) || 0
   const total = owned * base
 
+  const label = `${name} — coût : ${fmt(cost)} sups${!canAfford ? ', non disponible' : ''}`
+
   return (
-    <div
+    <button
+      type="button"
       className={`upgrade-card${canAfford ? ' affordable' : ' cant-afford'}${flash ? ' bought-flash' : ''}`}
       onClick={handleClick}
+      aria-label={label}
+      aria-disabled={!canAfford}
+      onKeyDown={(e) => { if (e.key === 'Enter' && e.repeat) e.preventDefault() }}
     >
       <div className="upgrade-icon">{upgrade.icon}</div>
       <div className="upgrade-info">
@@ -43,6 +49,6 @@ export default function UpgradeCard({ upgrade, cost, canAfford, onBuy }) {
         <div className="upgrade-cost-val">{fmt(cost)}</div>
         <div className="upgrade-cost-unit">sups</div>
       </div>
-    </div>
+    </button>
   )
 }

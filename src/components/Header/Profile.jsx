@@ -16,9 +16,15 @@ export default function Profile({ username, rankName, onLogout }) {
 
   return (
     <div className="profile-wrapper" ref={wrapperRef}>
-      <div className="profile-btn" onClick={(e) => { e.stopPropagation(); setOpen((o) => !o) }}>
+      <button
+        type="button"
+        className="profile-btn"
+        aria-label="Menu profil"
+        aria-expanded={open}
+        onClick={(e) => { e.stopPropagation(); setOpen((o) => !o) }}
+      >
         👤
-      </div>
+      </button>
       <div className={`profile-dropdown${open ? ' open' : ''}`}>
         <div className="profile-username">{username || 'Invité'}</div>
         <div className="profile-rank-badge">{rankName}</div>

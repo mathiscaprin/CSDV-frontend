@@ -1,5 +1,11 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+:focus-visible {
+  outline: 3px solid #a78bfa;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
 body {
   font-family: 'Segoe UI', system-ui, sans-serif;
   font-size: 16px;
