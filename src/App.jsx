@@ -105,7 +105,9 @@ function mapSessionData(session = {}, baseBatiments = [], userBatiments = []) {
 
   const supsPerSecond = upgrades.reduce((sum, upgrade) => {
     const owned = Number(upgrade.owned) || 0;
-    return sum + owned * (Number(upgrade.ordreAffichage) === 0 ? 0 : upgrade.cps);
+    return (
+      sum + owned * (Number(upgrade.ordreAffichage) === 0 ? 0 : upgrade.cps)
+    );
   }, 0);
 
   return {
@@ -126,6 +128,9 @@ export default function App() {
   const [sessionError, setSessionError] = useState(null);
   const [saveStatus, setSaveStatus] = useState("");
   const [clickCount, setClickCount] = useState(0);
+  const [autoSaveMsg, setAutoSaveMsg] = useState(null);
+  const [autoSaveKey, setAutoSaveKey] = useState(0);
+  const autoSaveClearRef = useRef(null);
 
   const {
     sups,
@@ -307,18 +312,41 @@ export default function App() {
   }
 
   useEffect(() => {
-    if (!auth || !sessionState) return;
+    if (!auth?.token) return;
 
-    const timeout = setTimeout(async () => {
+    let mounted = true;
+
+    const saveAll = async () => {
       try {
-        await saveGameState("Sauvegarde automatique");
+        const clickBoosterCount = upgradesRef.current.reduce(
+          (sum, upgrade) =>
+            sum +
+            (Number(upgrade.ordreAffichage) === 0 ? Number(upgrade.owned) : 0),
+          0,
+        );
+        await saveSession(
+          {
+            totalSups: totalSupsRef.current,
+            supsPerSecond: supsPerSecondRef.current,
+            supsPerClick: clickBoosterCount,
+            sups: supsRef.current,
+          },
+          auth.token,
+        );
+        await saveUpgrades(upgradesRef.current, auth.token);
+        if (mounted) setSaveStatus("Sauvegardé automatiquement");
       } catch {
         setSaveStatus("Erreur de sauvegarde");
       }
-    }, 2500);
+    };
 
-    return () => clearTimeout(timeout);
-  }, [auth, sessionState, totalSups, supsPerSecond, supsPerClick, sups, upgrades]);
+    const interval = setInterval(saveAll, 5 * 60 * 1000);
+
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
+  }, [auth?.token]);
 
   async function handleLogin(newAuth) {
     setAuth(newAuth);
@@ -357,6 +385,7 @@ export default function App() {
 
       <RankUpAnnouncement rank={rankUp} />
       <Confetti burst={rankUp} />
+      <Toast key={autoSaveKey} message={autoSaveMsg} />
 
       <Header
         sups={sups}

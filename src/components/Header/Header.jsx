@@ -1,8 +1,35 @@
+import { useEffect, useState } from 'react'
 import Profile from './Profile.jsx'
 import { fmt } from '../../utils/format.js'
 import './Header.css'
 
+const SAVE_COOLDOWN = 5
+
 export default function Header({ sups, supsPerSecond, rankName, username, onLogout, onSave, saveStatus }) {
+  const [showCheck, setShowCheck] = useState(false)
+  const [cooldown, setCooldown] = useState(0)
+
+  useEffect(() => {
+    if (!saveStatus || saveStatus.toLowerCase().includes('erreur')) return
+    setShowCheck(true)
+    const timer = setTimeout(() => setShowCheck(false), 2000)
+    return () => clearTimeout(timer)
+  }, [saveStatus])
+
+  useEffect(() => {
+    if (cooldown <= 0) return
+    const timer = setTimeout(() => setCooldown((c) => c - 1), 1000)
+    return () => clearTimeout(timer)
+  }, [cooldown])
+
+  function handleSave() {
+    if (cooldown > 0) return
+    onSave()
+    setCooldown(SAVE_COOLDOWN)
+  }
+
+  const disabled = cooldown > 0
+
   return (
     <header className="header">
       <div className="header-brand">
@@ -17,7 +44,18 @@ export default function Header({ sups, supsPerSecond, rankName, username, onLogo
         </div>
       </div>
 
-      <Profile username={username} rankName={rankName} onLogout={onLogout} onSave={onSave} saveStatus={saveStatus} />
+      <div className="header-actions">
+        <button
+          className={`save-btn${disabled ? ' save-btn--disabled' : ''}`}
+          onClick={handleSave}
+          disabled={disabled}
+          title={disabled ? `Disponible dans ${cooldown}s` : 'Sauvegarder'}
+        >
+          {disabled ? cooldown : '💾'}
+        </button>
+        {showCheck && <span className="save-check">✓</span>}
+        <Profile username={username} rankName={rankName} onLogout={onLogout} />
+      </div>
     </header>
   )
 }

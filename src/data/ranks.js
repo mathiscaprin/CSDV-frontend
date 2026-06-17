@@ -5,4 +5,5 @@ export const RANKS = [
   { name: '👨‍💼 Senior', threshold: 100000 },
   { name: '🎤 Intervenant', threshold: 500000 },
   { name: '🏛️ PDG', threshold: 1000000 },
+  { name: '👨‍💼 Directeur de Campus', threshold: 1000000000 },
 ]
