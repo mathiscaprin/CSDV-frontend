@@ -203,3 +203,49 @@
   font-size: 12px;
   line-height: 1.4;
 }
+
+/* ── Responsive mobile ───────────────────────────────────── */
+@media (max-width: 700px) {
+  .header {
+    flex-wrap: wrap;
+    padding: 8px 16px;
+    gap: 4px;
+  }
+
+  /* Rangée 1 : brand (gauche) + actions (droite) */
+  .header-brand {
+    order: 1;
+    flex: 1;
+    font-size: 12px;
+    letter-spacing: 1px;
+  }
+
+  .header-actions {
+    order: 2;
+    flex-shrink: 0;
+  }
+
+  /* Rangée 2 : score centré sur toute la largeur */
+  .score-block {
+    order: 3;
+    position: static;
+    transform: none;
+    width: 100%;
+    text-align: center;
+    padding: 2px 0 4px;
+  }
+
+  .score-label { display: none; }
+
+  .score-value { font-size: 26px; }
+
+  .score-cps { font-size: 12px; }
+
+  /* Boutons un peu plus petits */
+  .save-btn,
+  .profile-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 15px;
+  }
+}
