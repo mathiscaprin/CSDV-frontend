@@ -16,6 +16,12 @@
 }
 
 .upgrade-card {
+  appearance: none;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  text-align: left;
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 14px;
@@ -27,6 +33,11 @@
   transition: all 0.18s ease;
   position: relative;
   overflow: hidden;
+}
+
+.upgrade-card:focus-visible {
+  outline: 3px solid #a78bfa;
+  outline-offset: 2px;
 }
 
 .upgrade-card::before {

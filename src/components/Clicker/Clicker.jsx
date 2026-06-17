@@ -43,8 +43,16 @@ export default function Clicker({ onClick }) {
     pulse()
 
     const id = nextFloatId++
-    const float = { id, gained, x: e.clientX - 30, y: e.clientY - 20 }
-    setFloats((prev) => [...prev, float])
+    let x, y
+    if (e.clientX === 0 && e.clientY === 0) {
+      const rect = logoRef.current?.getBoundingClientRect()
+      x = (rect ? rect.left + rect.width / 2 : window.innerWidth / 2) - 30
+      y = (rect ? rect.top + rect.height / 2 : window.innerHeight / 2) - 20
+    } else {
+      x = e.clientX - 30
+      y = e.clientY - 20
+    }
+    setFloats((prev) => [...prev, { id, gained, x, y }])
     setTimeout(() => {
       setFloats((prev) => prev.filter((f) => f.id !== id))
     }, 860)
@@ -57,18 +65,21 @@ export default function Clicker({ onClick }) {
 
   return (
     <div className="clicker-wrapper">
-      <div
+      <button
+        type="button"
         ref={logoRef}
         className="logo-btn"
+        aria-label="Cliquer pour gagner des sups"
         onClick={handleClick}
         onContextMenu={handleRightClick}
+        onKeyDown={(e) => { if (e.key === 'Enter' && e.repeat) e.preventDefault() }}
       >
         <div className="logo-text">
           SUP<sup>2</sup>
           <br />
           VINCI
         </div>
-      </div>
+      </button>
       {floats.map((f) => (
         <div
           key={f.id}
