@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { getSuccesses } from "../utils/api.js";
+import { getSuccesses, addSessionSuccesses } from "../utils/api.js";
 
 const LIST_KEYS = ["data", "successes", "succes", "items", "results"];
 const ID_KEYS = ["id", "_id", "uuid", "slug"];
@@ -307,7 +307,10 @@ function getMetricValue(metricName, gameMetrics) {
   const key = normalizeKey(metricName);
 
   const definition = METRIC_DEFINITIONS.find(({ metric, aliases }) => {
-    return metric === metricName || aliases.some((alias) => normalizeKey(alias) === key);
+    return (
+      metric === metricName ||
+      aliases.some((alias) => normalizeKey(alias) === key)
+    );
   });
 
   return definition ? gameMetrics[definition.metric] : undefined;
@@ -317,7 +320,10 @@ function getMetricName(metricName) {
   if (!metricName) return null;
   const key = normalizeKey(metricName);
   const definition = METRIC_DEFINITIONS.find(({ metric, aliases }) => {
-    return normalizeKey(metric) === key || aliases.some((alias) => normalizeKey(alias) === key);
+    return (
+      normalizeKey(metric) === key ||
+      aliases.some((alias) => normalizeKey(alias) === key)
+    );
   });
 
   return definition?.metric ?? null;
@@ -344,7 +350,9 @@ function getMetricFromCandidate(candidate) {
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase();
 
-  return METRIC_DEFINITIONS.find(({ pattern }) => pattern.test(text))?.metric ?? null;
+  return (
+    METRIC_DEFINITIONS.find(({ pattern }) => pattern.test(text))?.metric ?? null
+  );
 }
 
 function getMetricThresholdFromCandidate(candidate) {
@@ -498,12 +506,14 @@ function isSuccessAchieved(success, gameMetrics) {
   if (threshold === null) return false;
 
   const metric =
-    candidates.map((candidate) => getMetricFromCandidate(candidate)).find(Boolean) ??
-    inferMetric(success, condition, threshold);
+    candidates
+      .map((candidate) => getMetricFromCandidate(candidate))
+      .find(Boolean) ?? inferMetric(success, condition, threshold);
 
   if (!metric) return false;
 
-  const currentValue = gameMetrics[metric] ?? getMetricValue(metric, gameMetrics);
+  const currentValue =
+    gameMetrics[metric] ?? getMetricValue(metric, gameMetrics);
   return currentValue !== undefined && Number(currentValue) >= threshold;
 }
 
@@ -523,7 +533,13 @@ function toPopupItem(success, id) {
 
 export function useSuccesses(
   gameMetrics,
-  { enabled = true, localSuccesses = [], resetKey = "default" } = {},
+  {
+    enabled = true,
+    localSuccesses = [],
+    resetKey = "default",
+    sessionId,
+    token,
+  } = {},
 ) {
   const [successes, setSuccesses] = useState([]);
   const [unlockedIds, setUnlockedIds] = useState([]);
@@ -605,6 +621,16 @@ export function useSuccesses(
       return;
     }
 
+    const succesIds = newlyUnlocked.map((popup) => popup.id);
+
+    if (succesIds.length > 0) {
+      console.log("POST succès", { sessionId, succesIds });
+
+      addSessionSuccesses(token, succesIds).catch((err) => {
+        console.error("Erreur ajout succès session :", err);
+      });
+    }
+
     setUnlockedIds((prev) => [
       ...prev,
       ...newlyUnlocked.map((popup) => popup.id),
@@ -626,7 +652,7 @@ export function useSuccesses(
       }, 4000);
       popupTimersRef.current.set(popup.popupId, timer);
     });
-  }, [enabled, successes, gameMetrics]);
+  }, [enabled, successes, gameMetrics, token]);
 
   return { successes, unlockedIds, popups, error };
 }

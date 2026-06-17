@@ -63,7 +63,9 @@ export async function saveSession(sessionState) {
       supsTotal: String(Math.round(sessionState.totalSups)),
       supsPerSecond: String(sessionState.supsPerSecond),
       supsPerClick: String(sessionState.supsPerClick),
-      supsMonney: Math.round(Number(sessionState.sups ?? sessionState.supsMonney ?? 0)),
+      supsMonney: Math.round(
+        Number(sessionState.sups ?? sessionState.supsMonney ?? 0),
+      ),
     },
   });
 }
@@ -90,25 +92,35 @@ export async function saveUpgrades(upgrades, token) {
   const body = (upgrades || []).map((u) => ({
     batimentId: String(u.id),
     quantite: Number(u.owned) || 0,
-  }))
+  }));
 
-  return request('/session/batiments', {
-    method: 'PUT',
+  return request("/session/batiments", {
+    method: "PUT",
     token,
     body,
-  })
+  });
 }
 
 export async function getUpgradesBySession(token) {
-  return request('/session/batiments', {
-    method: 'GET',
+  return request("/session/batiments", {
+    method: "GET",
     token,
-  })
+  });
 }
 
 export async function getUpgrade(token) {
-  return request('/batiments', {
-    method: 'GET',
+  return request("/batiments", {
+    method: "GET",
     token,
-  })
+  });
+}
+
+export async function addSessionSuccesses(token, succesIds) {
+  return request("/session/succes/ajouter", {
+    method: "POST",
+    token,
+    body: {
+      succesIds,
+    },
+  });
 }

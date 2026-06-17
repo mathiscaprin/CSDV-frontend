@@ -182,6 +182,7 @@ export default function App() {
   } = useSuccesses(gameMetrics, {
     enabled: Boolean(auth && sessionState),
     localSuccesses: DEBUG_SUCCESSES,
+    token: auth?.token,
     resetKey:
       auth?.userId ??
       auth?.id ??
