@@ -50,8 +50,9 @@ export function useGameState(initialState = {}) {
       const cost = getUpgradeCost(upgrade)
       if (sups < cost) return prev
       setSups((s) => s - cost)
-      setSupsPerClick((c) => c + upgrade.cpc)
-      setSupsPerSecond((c) => c + upgrade.cps)
+      const isClickBooster = Number(upgrade.ordreAffichage) === 0
+      setSupsPerClick((c) => c + (isClickBooster ? 1 : (upgrade.cpc ?? 0)))
+      setSupsPerSecond((c) => c + (isClickBooster ? 0 : (upgrade.cps ?? 0)))
       return prev.map((u) => (u.id === id ? { ...u, owned: u.owned + 1 } : u))
     })
   }
