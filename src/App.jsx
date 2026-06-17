@@ -9,7 +9,8 @@ import LoginPage from './components/Auth/LoginPage.jsx'
 import Leaderboard from './components/Leaderboard/Leaderboard.jsx'
 import { useGameState } from './hooks/useGameState.js'
 import { getCurrentRank, getNextRank, getProgress } from './utils/ranks.js'
-import { createSession, getSession, saveSession, signOut } from './utils/api.js'
+import { createSession, getSession, saveSession, saveUpgrades, getUpgrade, getUpgradesBySession } from './utils/api.js'
+import { INITIAL_UPGRADES } from './data/upgrades.js'
 import './App.css'
 
 const USER_STORAGE_KEY = 'clicker-sdv-user'
@@ -31,12 +32,38 @@ function saveUser(user) {
   }
 }
 
-function mapSessionData(session = {}) {
+function mapSessionData(session = {}, baseBatiments = [], userBatiments = []) {
+  console.log(Array.isArray(baseBatiments))
+  const baseList = Array.isArray(baseBatiments) && baseBatiments.length ? baseBatiments : INITIAL_UPGRADES
+
+  const savedUpgrades = Array.isArray(userBatiments) ? userBatiments : []
+  
+  // Filtre les améliorations utilisateur : ne garder que celles qui existent dans la base
+  const validUpgrades = savedUpgrades.filter((saved) =>
+    baseList.some((b) => String(b.id) === String(saved.batimentId))
+  )
+  
+  const upgrades = baseList.map((batiment) => {
+    const saved = validUpgrades.find((b) => String(b.batimentId) === String(batiment.id))
+    return {
+      ...batiment,
+      name: batiment.name ?? batiment.nom,
+      desc: batiment.desc ?? batiment.description,
+      baseCost: batiment.baseCost ?? batiment.coutBase,
+      cps: batiment.cps ?? batiment.multiplicateurCps ?? 0,
+      cpc: batiment.cpc ?? 0,
+      ordreAffichage: batiment.ordreAffichage ?? batiment.ordreAffichage,
+      owned: Number(saved?.quantite) || 0,
+    }
+  })
+
   return {
-    sups: Number(session.supsTotal) || 0,
+    sups: Number(session.supsMonney) || 0,
     totalSups: Number(session.supsTotal) || 0,
     supsPerClick: Number(session.supsPerClick) || 1,
     supsPerSecond: Number(session.supsPerSecond) || 0,
+    upgrades,
+    filteredUserUpgrades: validUpgrades, // retourner les améliorations filtrées
   }
 }
 
@@ -79,27 +106,113 @@ export default function App() {
     saveUser(auth)
   }, [auth])
 
-  async function loadSession() {
+  const totalSupsRef = useRef(totalSups)
+  const supsPerSecondRef = useRef(supsPerSecond)
+  const supsPerClickRef = useRef(supsPerClick)
+  const supsRef = useRef(sups)
+  const upgradesRef = useRef(upgrades)
+
+  useEffect(() => {
+    totalSupsRef.current = totalSups
+  }, [totalSups])
+
+  useEffect(() => {
+    supsPerSecondRef.current = supsPerSecond
+  }, [supsPerSecond])
+
+  useEffect(() => {
+    supsPerClickRef.current = supsPerClick
+  }, [supsPerClick])
+
+  useEffect(() => {
+    supsRef.current = sups
+  }, [sups])
+
+  useEffect(() => {
+    upgradesRef.current = upgrades
+  }, [upgrades])
+
+  async function loadSession(token) {
     setLoadingSession(true)
     setSessionError(null)
 
-    const response = await getSession()
+    const response = await getSession(token)
     if (response.ok) {
-      setSessionState(mapSessionData(response.data))
+      // fetch base batiments and user saved batiments
+      try {
+        const [baseResp, sessionBatimentsResp] = await Promise.all([
+          getUpgrade(),
+          getUpgradesBySession(token),
+        ])
+                if (baseResp.ok) {
+          const sessionData = mapSessionData(
+            response.data,
+            baseResp.data,
+            sessionBatimentsResp.ok ? sessionBatimentsResp.data : [], 
+          )                  // Nettoie les améliorations obsolètes en sauvegardant les améliorations filtrées
+          if (sessionBatimentsResp.ok && sessionData.filteredUserUpgrades) {
+            const obsoleteItems = (sessionBatimentsResp.data || []).filter(
+              (saved) => !baseResp.data.some((b) => String(b.id) === String(saved.batimentId))
+            )
+            
+            if (obsoleteItems.length > 0) {
+              // Des améliorations ont été supprimées, sauvegarde la liste filtrée
+              await saveUpgrades(sessionData.upgrades, token)
+            }
+          }
+          
+          setSessionState(sessionData)
+        } else {
+          setSessionState(mapSessionData(response.data))
+        }
+      } catch {
+        setSessionState(mapSessionData(response.data))
+      }
       setLoadingSession(false)
       return
     }
 
     if (response.status === 404) {
-      const createResponse = await createSession()
+      const createResponse = await createSession(token)
       if (!createResponse.ok && createResponse.status !== 201) {
         setSessionError('Impossible de créer la session de jeu.')
         setLoadingSession(false)
         return
       }
-      const retry = await getSession()
+      const retry = await getSession(token)
       if (retry.ok) {
-        setSessionState(mapSessionData(retry.data))
+        try {
+          const [baseResp, sessionBatimentsResp] = await Promise.all([
+            getUpgrade(),
+            getUpgradesBySession(token),
+          ])
+
+          if (baseResp.ok) {
+            const sessionData = mapSessionData(
+              retry.data,
+              baseResp.data,
+              sessionBatimentsResp.ok ? sessionBatimentsResp.data : [],
+            )
+            
+            // Nettoie les améliorations obsolètes en sauvegardant les améliorations filtrées
+            if (sessionBatimentsResp.ok && sessionData.filteredUserUpgrades) {
+              const obsoleteItems = (sessionBatimentsResp.data || []).filter(
+                (saved) => !baseResp.data.some((b) => String(b.id) === String(saved.batimentId))
+              )
+              
+              if (obsoleteItems.length > 0) {
+                // Des améliorations ont été supprimées, sauvegarde la liste filtrée
+                await saveUpgrades(sessionData.upgrades, token)
+              }
+            }
+            
+            setSessionState(sessionData)
+          } else {
+            setSessionState(mapSessionData(retry.data))
+          }
+        } catch {
+          setSessionState(mapSessionData(retry.data))
+        }
       } else {
         setSessionState({ sups: 0, totalSups: 0, supsPerClick: 1, supsPerSecond: 0 })
       }
@@ -121,22 +234,31 @@ export default function App() {
 
   useEffect(() => {
     if (!auth) return
-    loadSession()
+    loadSession(auth.token)
   }, [auth])
 
   useEffect(() => {
-    if (!auth) return
-    const timeout = setTimeout(async () => {
-      try {
-        await saveSession({ totalSups, supsPerSecond, supsPerClick })
-        setSaveStatus('Sauvegardé automatiquement')
-      } catch {
-        setSaveStatus('Erreur de sauvegarde')
-      }
-    }, 2500)
+    if (!auth?.token) return
 
-    return () => clearTimeout(timeout)
-  }, [auth, totalSups, supsPerSecond, supsPerClick])
+    let mounted = true
+
+    const saveAll = async () => {
+      try {
+        await saveSession({ totalSups: totalSupsRef.current, supsPerSecond: supsPerSecondRef.current, supsPerClick: supsPerClickRef.current, sups: supsRef.current }, auth.token)
+        await saveUpgrades(upgradesRef.current, auth.token)
+        if (mounted) setSaveStatus('Sauvegardé automatiquement')
+      } catch {
+        if (mounted) setSaveStatus('Erreur de sauvegarde')
+      }
+    }
+
+    const interval = setInterval(saveAll, 5 * 60 * 1000)
+
+    return () => {
+      mounted = false
+      clearInterval(interval)
+    }
+  }, [auth?.token])
 
   async function handleLogin(newAuth) {
     setAuth(newAuth)
@@ -147,7 +269,8 @@ export default function App() {
   async function handleManualSave() {
     if (!auth) return
     try {
-      await saveSession({ totalSups, supsPerSecond, supsPerClick })
+      await saveSession({ totalSups, supsPerSecond, supsPerClick, sups }, auth.token)
+      await saveUpgrades(upgrades, auth.token)
       setSaveStatus('Sauvegarde envoyée')
     } catch {
       setSaveStatus('Erreur de sauvegarde')

@@ -52,9 +52,10 @@ export async function saveSession(sessionState) {
   return request('/session', {
     method: 'PUT',
     body: {
-      supsTotal: String(sessionState.totalSups),
+      supsTotal: String(Math.round(sessionState.totalSups)),
       supsPerSecond: String(sessionState.supsPerSecond),
       supsPerClick: String(sessionState.supsPerClick),
+      supsMonney: Math.round(Number(sessionState.sups ?? sessionState.supsMonney ?? 0)),
     },
   })
 }
@@ -68,5 +69,32 @@ export async function getLeaderboard() {
 export async function signOut() {
   return request('/auth/deconnexion', {
     method: 'POST',
+  })
+}
+
+export async function saveUpgrades(upgrades, token) {
+  const body = (upgrades || []).map((u) => ({
+    batimentId: String(u.id),
+    quantite: Number(u.owned) || 0,
+  }))
+
+  return request('/session/batiments', {
+    method: 'PUT',
+    token,
+    body,
+  })
+}
+
+export async function getUpgradesBySession(token) {
+  return request('/session/batiments', {
+    method: 'GET',
+    token,
+  })
+}
+
+export async function getUpgrade(token) {
+  return request('/batiments', {
+    method: 'GET',
+    token,
   })
 }
