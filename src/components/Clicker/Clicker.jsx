@@ -20,6 +20,15 @@ const PULSE_OPTIONS = {
 export default function Clicker({ onClick }) {
   const [floats, setFloats] = useState([])
   const logoRef = useRef(null)
+  const clickTimestampsRef = useRef([])
+
+  function isThrottled() {
+    const now = Date.now()
+    clickTimestampsRef.current = clickTimestampsRef.current.filter((t) => now - t < 1000)
+    if (clickTimestampsRef.current.length >= 30) return true
+    clickTimestampsRef.current.push(now)
+    return false
+  }
 
   function pulse() {
     const node = logoRef.current
@@ -29,6 +38,7 @@ export default function Clicker({ onClick }) {
   }
 
   function handleClick(e) {
+    if (isThrottled()) return
     const gained = onClick()
     pulse()
 
