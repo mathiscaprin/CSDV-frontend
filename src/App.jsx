@@ -379,19 +379,16 @@ export default function App() {
             sum +
             (Number(upgrade.ordreAffichage) === 0 ? Number(upgrade.owned) : 0),
           0,
-        );
-        await saveSession({
-          totalSups: totalSupsRef.current,
-          supsPerSecond: supsPerSecondRef.current,
-          supsPerClick: clickBoosterCount,
-          sups: supsRef.current,
-        });
-        await saveUpgrades(upgradesRef.current);
-        if (!mounted) return;
-        clearTimeout(autoSaveClearRef.current);
-        setAutoSaveMsg("Sauvegarde automatique effectuée");
-        setAutoSaveKey((k) => k + 1);
-        autoSaveClearRef.current = setTimeout(() => setAutoSaveMsg(null), 3200);
+        )
+        await saveSession({ totalSups: totalSupsRef.current, supsPerSecond: supsPerSecondRef.current, supsPerClick: clickBoosterCount, sups: supsRef.current })
+        await saveUpgrades(upgradesRef.current)
+        if (!mounted) return
+        clearTimeout(autoSaveClearRef.current)
+        setAutoSaveMsg('Sauvegarde automatique effectuée')
+        setAutoSaveKey((k) => k + 1)
+        autoSaveClearRef.current = setTimeout(() => setAutoSaveMsg(null), 3200)
+        window.speechSynthesis?.cancel()
+        window.speechSynthesis?.speak(Object.assign(new SpeechSynthesisUtterance('Sauvegarde effectuée'), { lang: 'fr-FR' }))
       } catch {
         if (mounted) setSaveStatus("Erreur de sauvegarde");
       }
@@ -419,13 +416,12 @@ export default function App() {
           sum +
           (Number(upgrade.ordreAffichage) === 0 ? Number(upgrade.owned) : 0),
         0,
-      );
-      await saveSession(
-        { totalSups, supsPerSecond, supsPerClick: clickBoosterCount, sups },
-        auth.token,
-      );
-      await saveUpgrades(upgrades, auth.token);
-      setSaveStatus("Sauvegarde envoyée");
+      )
+      await saveSession({ totalSups, supsPerSecond, supsPerClick: clickBoosterCount, sups }, auth.token)
+      await saveUpgrades(upgrades, auth.token)
+      setSaveStatus('Sauvegarde envoyée')
+      window.speechSynthesis?.cancel()
+      window.speechSynthesis?.speak(Object.assign(new SpeechSynthesisUtterance('Sauvegarde effectuée'), { lang: 'fr-FR' }))
     } catch {
       setSaveStatus("Erreur de sauvegarde");
     }

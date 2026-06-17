@@ -11,15 +11,39 @@
   backdrop-filter: blur(8px);
 }
 
-.leaderboard h3 {
-  margin: 0 0 10px 0;
+/* ── Toggle button ───────────────────────────────────────── */
+.leaderboard-toggle {
+  appearance: none;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  font-family: inherit;
   font-size: 1rem;
   font-weight: 700;
   color: #f8f8ff;
-  text-align: center;
   text-shadow: 0 0 12px rgba(139, 92, 246, 0.4);
+  cursor: default;
 }
 
+.leaderboard-arrow {
+  font-size: 0.75rem;
+  color: #a78bfa;
+  display: none;
+}
+
+.leaderboard-toggle:focus-visible {
+  outline: 3px solid #a78bfa;
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+/* ── List ────────────────────────────────────────────────── */
 .leaderboard-list {
   list-style: none;
   margin: 0;
@@ -60,17 +84,9 @@
   min-width: 30px;
 }
 
-.leaderboard-item:nth-child(1) .rank {
-  color: #ffd700;
-}
-
-.leaderboard-item:nth-child(2) .rank {
-  color: #c0c0c0;
-}
-
-.leaderboard-item:nth-child(3) .rank {
-  color: #cd7f32;
-}
+.leaderboard-item:nth-child(1) .rank { color: #ffd700; }
+.leaderboard-item:nth-child(2) .rank { color: #c0c0c0; }
+.leaderboard-item:nth-child(3) .rank { color: #cd7f32; }
 
 .leaderboard-item .username {
   flex: 1;
@@ -96,13 +112,6 @@
   font-weight: 700;
 }
 
-.leaderboard h3:focus-visible,
-.leaderboard-item:focus-visible {
-  outline: 3px solid #a78bfa;
-  outline-offset: 2px;
-  border-radius: 8px;
-}
-
 .leaderboard-separator {
   text-align: center;
   color: rgba(139, 92, 246, 0.4);
@@ -112,6 +121,13 @@
   list-style: none;
 }
 
+.leaderboard h3:focus-visible,
+.leaderboard-item:focus-visible {
+  outline: 3px solid #a78bfa;
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
 .leaderboard.loading,
 .leaderboard.error {
   text-align: center;
@@ -119,12 +135,35 @@
   font-size: 0.9rem;
 }
 
+/* ── Mobile : toggle actif, body masqué par défaut ──────── */
 @media (max-width: 900px) {
   .leaderboard {
-    position: fixed;
     bottom: 12px;
     right: 12px;
     width: calc(100% - 24px);
-    max-width: 300px;
+    max-width: 340px;
+    padding: 10px 12px;
+  }
+
+  .leaderboard-toggle {
+    cursor: pointer;
+    margin-bottom: 0;
+  }
+
+  .leaderboard-arrow {
+    display: inline;
+  }
+
+  .leaderboard-body {
+    display: none;
+    margin-top: 10px;
+  }
+
+  .leaderboard--open .leaderboard-body {
+    display: block;
+  }
+
+  .leaderboard-toggle:hover {
+    color: #c4b5f4;
   }
 }
