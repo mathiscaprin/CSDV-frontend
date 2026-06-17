@@ -120,7 +120,7 @@ export async function addSessionSuccesses(token, succesIds) {
     method: "POST",
     token,
     body: {
-      succesIds,
+      succesIds: succesIds.map((id) => String(id)),
     },
   });
 }
