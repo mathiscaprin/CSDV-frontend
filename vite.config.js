@@ -15,6 +15,11 @@ export default defineConfig(({ command }) => ({
         changeOrigin: true,
         secure: true,
       },
+      '/batiments': {
+        target: 'https://clicker-sdv-back.onrender.com',
+        changeOrigin: true,
+        secure: true,
+      },
     },
   },
 }))
