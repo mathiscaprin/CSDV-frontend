@@ -369,16 +369,25 @@ export default function App() {
             sum +
             (Number(upgrade.ordreAffichage) === 0 ? Number(upgrade.owned) : 0),
           0,
-        )
-        await saveSession({ totalSups: totalSupsRef.current, supsPerSecond: supsPerSecondRef.current, supsPerClick: clickBoosterCount, sups: supsRef.current })
-        await saveUpgrades(upgradesRef.current)
-        if (!mounted) return
-        clearTimeout(autoSaveClearRef.current)
-        setAutoSaveMsg('Sauvegarde automatique effectuée')
-        setAutoSaveKey((k) => k + 1)
-        autoSaveClearRef.current = setTimeout(() => setAutoSaveMsg(null), 3200)
-        window.speechSynthesis?.cancel()
-        window.speechSynthesis?.speak(Object.assign(new SpeechSynthesisUtterance('Sauvegarde effectuée'), { lang: 'fr-FR' }))
+        );
+        await saveSession({
+          totalSups: totalSupsRef.current,
+          supsPerSecond: supsPerSecondRef.current,
+          supsPerClick: clickBoosterCount,
+          sups: supsRef.current,
+        });
+        await saveUpgrades(upgradesRef.current);
+        if (!mounted) return;
+        clearTimeout(autoSaveClearRef.current);
+        setAutoSaveMsg("Sauvegarde automatique effectuée");
+        setAutoSaveKey((k) => k + 1);
+        autoSaveClearRef.current = setTimeout(() => setAutoSaveMsg(null), 3200);
+        window.speechSynthesis?.cancel();
+        window.speechSynthesis?.speak(
+          Object.assign(new SpeechSynthesisUtterance("Sauvegarde effectuée"), {
+            lang: "fr-FR",
+          }),
+        );
       } catch {
         if (mounted) setSaveStatus("Erreur de sauvegarde");
       }
@@ -406,12 +415,19 @@ export default function App() {
           sum +
           (Number(upgrade.ordreAffichage) === 0 ? Number(upgrade.owned) : 0),
         0,
-      )
-      await saveSession({ totalSups, supsPerSecond, supsPerClick: clickBoosterCount, sups }, auth.token)
-      await saveUpgrades(upgrades, auth.token)
-      setSaveStatus('Sauvegarde envoyée')
-      window.speechSynthesis?.cancel()
-      window.speechSynthesis?.speak(Object.assign(new SpeechSynthesisUtterance('Sauvegarde effectuée'), { lang: 'fr-FR' }))
+      );
+      await saveSession(
+        { totalSups, supsPerSecond, supsPerClick: clickBoosterCount, sups },
+        auth.token,
+      );
+      await saveUpgrades(upgrades, auth.token);
+      setSaveStatus("Sauvegarde envoyée");
+      window.speechSynthesis?.cancel();
+      window.speechSynthesis?.speak(
+        Object.assign(new SpeechSynthesisUtterance("Sauvegarde effectuée"), {
+          lang: "fr-FR",
+        }),
+      );
     } catch {
       setSaveStatus("Erreur de sauvegarde");
     }
@@ -466,21 +482,6 @@ export default function App() {
 
         <UpgradesList upgrades={upgrades} sups={sups} onBuy={buyUpgrade} />
       </main>
-
-      <aside className="debug-window" aria-label="Debug succes">
-        <div className="debug-window-title">Debug succes</div>
-        <div className="debug-window-row">
-          <span>Succes recuperes</span>
-          <strong>{successes.length}</strong>
-        </div>
-        <div className="debug-window-row">
-          <span>Succes reussis</span>
-          <strong>{unlockedIds.length}</strong>
-        </div>
-        {successesError ? (
-          <div className="debug-window-error">{successesError}</div>
-        ) : null}
-      </aside>
 
       <AchievementPopup items={popups} />
 
