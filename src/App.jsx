@@ -51,16 +51,27 @@ function mapSessionData(session = {}, baseBatiments = [], userBatiments = []) {
       desc: batiment.desc ?? batiment.description,
       baseCost: batiment.baseCost ?? batiment.coutBase,
       cps: batiment.cps ?? batiment.multiplicateurCps ?? 0,
-      cpc: batiment.cpc ?? 0,
-      ordreAffichage: batiment.ordreAffichage ?? batiment.ordreAffichage,
+      cpc: batiment.cpc ?? (Number(batiment.ordreAffichage) === 0 ? 1 : 0),
+      ordreAffichage: batiment.ordreAffichage,
       owned: Number(saved?.quantite) || 0,
     }
   })
 
+  const clickBoosterCount = upgrades.reduce(
+    (sum, upgrade) => sum + (Number(upgrade.ordreAffichage) === 0 ? Number(upgrade.owned) : 0),
+    0,
+  )
+
+  const actualSupsPerClick = upgrades.reduce((sum, upgrade) => {
+    const owned = Number(upgrade.owned) || 0
+    return sum + (Number(upgrade.ordreAffichage) === 0 ? owned : owned * (upgrade.cpc ?? 0))
+  }, 1)
+
   return {
     sups: Number(session.supsMonney) || 0,
     totalSups: Number(session.supsTotal) || 0,
-    supsPerClick: Number(session.supsPerClick) || 1,
+    supsPerClick: actualSupsPerClick,
+    supsPerClickCount: clickBoosterCount,
     supsPerSecond: Number(session.supsPerSecond) || 0,
     upgrades,
     filteredUserUpgrades: validUpgrades, // retourner les améliorations filtrées
@@ -244,7 +255,11 @@ export default function App() {
 
     const saveAll = async () => {
       try {
-        await saveSession({ totalSups: totalSupsRef.current, supsPerSecond: supsPerSecondRef.current, supsPerClick: supsPerClickRef.current, sups: supsRef.current }, auth.token)
+        const clickBoosterCount = upgradesRef.current.reduce(
+          (sum, upgrade) => sum + (Number(upgrade.ordreAffichage) === 0 ? Number(upgrade.owned) : 0),
+          0,
+        )
+        await saveSession({ totalSups: totalSupsRef.current, supsPerSecond: supsPerSecondRef.current, supsPerClick: clickBoosterCount, sups: supsRef.current }, auth.token)
         await saveUpgrades(upgradesRef.current, auth.token)
         if (mounted) setSaveStatus('Sauvegardé automatiquement')
       } catch {
@@ -269,7 +284,11 @@ export default function App() {
   async function handleManualSave() {
     if (!auth) return
     try {
-      await saveSession({ totalSups, supsPerSecond, supsPerClick, sups }, auth.token)
+      const clickBoosterCount = upgrades.reduce(
+        (sum, upgrade) => sum + (Number(upgrade.ordreAffichage) === 0 ? Number(upgrade.owned) : 0),
+        0,
+      )
+      await saveSession({ totalSups, supsPerSecond, supsPerClick: clickBoosterCount, sups }, auth.token)
       await saveUpgrades(upgrades, auth.token)
       setSaveStatus('Sauvegarde envoyée')
     } catch {

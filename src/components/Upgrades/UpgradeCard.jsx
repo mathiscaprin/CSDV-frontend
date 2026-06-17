@@ -18,8 +18,9 @@ export default function UpgradeCard({ upgrade, cost, canAfford, onBuy }) {
 
   const name = upgrade.nom ?? upgrade.name
   const description = upgrade.description ?? upgrade.desc
-  const cps = upgrade.multiplicateurCps ?? upgrade.cps ?? 0
-  const cpc = upgrade.cpc ?? 0
+  const isClickBooster = Number(upgrade.ordreAffichage) === 0
+  const cps = isClickBooster ? 0 : (upgrade.multiplicateurCps ?? upgrade.cps ?? 0)
+  const cpc = isClickBooster ? 1 : (upgrade.cpc ?? 0)
   const isCps = cps > 0
   const base = isCps ? cps : cpc
   const unit = isCps ? 'sups/sec' : 'sups/clic'
