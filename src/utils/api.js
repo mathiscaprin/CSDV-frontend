@@ -119,8 +119,6 @@ export async function addSessionSuccesses(token, succesIds) {
   return request("/session/succes/ajouter", {
     method: "POST",
     token,
-    body: {
-      succesIds: succesIds.map((id) => String(id)),
-    },
+    body: succesIds.map((id) => String(id)),
   });
 }
