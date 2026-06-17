@@ -42,3 +42,53 @@ main {
   border: 1px solid rgba(248, 113, 113, 0.3);
   text-align: center;
 }
+
+.debug-window {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 1300;
+  width: min(240px, calc(100vw - 32px));
+  padding: 12px 14px;
+  border: 1px solid rgba(167, 139, 250, 0.35);
+  border-radius: 8px;
+  background: rgba(9, 4, 18, 0.88);
+  color: #f8f8ff;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.32);
+  backdrop-filter: blur(10px);
+  font-size: 13px;
+  pointer-events: none;
+}
+
+.debug-window-title {
+  margin-bottom: 8px;
+  color: #d8b4fe;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.debug-window-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  line-height: 1.7;
+}
+
+.debug-window-row span {
+  color: rgba(248, 248, 255, 0.78);
+}
+
+.debug-window-row strong {
+  color: #ffffff;
+  font-variant-numeric: tabular-nums;
+}
+
+.debug-window-error {
+  margin-top: 8px;
+  color: #fecaca;
+  font-size: 12px;
+  line-height: 1.4;
+}

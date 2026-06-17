@@ -1,3 +1,17 @@
+import { useEffect, useRef, useState } from 'react'
+import Header from './components/Header/Header.jsx'
+import Clicker from './components/Clicker/Clicker.jsx'
+import ProgressBar from './components/ProgressBar/ProgressBar.jsx'
+import UpgradesList from './components/Upgrades/UpgradesList.jsx'
+import RankUpAnnouncement from './components/RankUpAnnouncement/RankUpAnnouncement.jsx'
+import Confetti from './components/Confetti/Confetti.jsx'
+import LoginPage from './components/Auth/LoginPage.jsx'
+import Leaderboard from './components/Leaderboard/Leaderboard.jsx'
+import { useGameState } from './hooks/useGameState.js'
+import { getCurrentRank, getNextRank, getProgress } from './utils/ranks.js'
+import { createSession, getSession, saveSession, saveUpgrades, getUpgrade, getUpgradesBySession } from './utils/api.js'
+import { INITIAL_UPGRADES } from './data/upgrades.js'
+import './App.css'
 import { useEffect, useRef, useState } from "react";
 import Header from "./components/Header/Header.jsx";
 import Clicker from "./components/Clicker/Clicker.jsx";
@@ -8,6 +22,7 @@ import Confetti from "./components/Confetti/Confetti.jsx";
 import LoginPage from "./components/Auth/LoginPage.jsx";
 import Leaderboard from "./components/Leaderboard/Leaderboard.jsx";
 import { useGameState } from "./hooks/useGameState.js";
+import { useSuccesses } from "./hooks/useSuccesses.js";
 import { getCurrentRank, getNextRank, getProgress } from "./utils/ranks.js";
 import {
   createSession,
@@ -15,6 +30,7 @@ import {
   saveSession,
   signOut,
 } from "./utils/api.js";
+import AchievementPopup from "./components/Achievements/AchievementPopup.jsx";
 import "./App.css";
 
 const USER_STORAGE_KEY = "clicker-sdv-user";
@@ -36,12 +52,50 @@ function saveUser(user) {
   }
 }
 
-function mapSessionData(session = {}) {
+function mapSessionData(session = {}, baseBatiments = [], userBatiments = []) {
+  console.log(Array.isArray(baseBatiments))
+  const baseList = Array.isArray(baseBatiments) && baseBatiments.length ? baseBatiments : INITIAL_UPGRADES
+
+  const savedUpgrades = Array.isArray(userBatiments) ? userBatiments : []
+  
+  // Filtre les améliorations utilisateur : ne garder que celles qui existent dans la base
+  const validUpgrades = savedUpgrades.filter((saved) =>
+    baseList.some((b) => String(b.id) === String(saved.batimentId))
+  )
+  
+  const upgrades = baseList.map((batiment) => {
+    const saved = validUpgrades.find((b) => String(b.batimentId) === String(batiment.id))
+    return {
+      ...batiment,
+      name: batiment.name ?? batiment.nom,
+      desc: batiment.desc ?? batiment.description,
+      baseCost: batiment.baseCost ?? batiment.coutBase,
+      cps: batiment.cps ?? batiment.multiplicateurCps ?? 0,
+      cpc: batiment.cpc ?? (Number(batiment.ordreAffichage) === 0 ? 1 : 0),
+      ordreAffichage: batiment.ordreAffichage,
+      owned: Number(saved?.quantite) || 0,
+    }
+  })
+
+  const clickBoosterCount = upgrades.reduce(
+    (sum, upgrade) => sum + (Number(upgrade.ordreAffichage) === 0 ? Number(upgrade.owned) : 0),
+    0,
+  )
+
+  const actualSupsPerClick = upgrades.reduce((sum, upgrade) => {
+    const owned = Number(upgrade.owned) || 0
+    return sum + (Number(upgrade.ordreAffichage) === 0 ? owned : owned * (upgrade.cpc ?? 0))
+  }, 1)
+
   return {
-    sups: Number(session.supsTotal) || 0,
+    sups: Number(session.supsMonney) || 0,
     totalSups: Number(session.supsTotal) || 0,
-    supsPerClick: Number(session.supsPerClick) || 1,
+    supsPerClick: actualSupsPerClick,
+    supsPerClickCount: clickBoosterCount,
     supsPerSecond: Number(session.supsPerSecond) || 0,
+    upgrades,
+    filteredUserUpgrades: validUpgrades, // retourner les améliorations filtrées
+  }
   };
 }
 
@@ -51,6 +105,7 @@ export default function App() {
   const [loadingSession, setLoadingSession] = useState(false);
   const [sessionError, setSessionError] = useState(null);
   const [saveStatus, setSaveStatus] = useState("");
+  const [clickCount, setClickCount] = useState(0);
 
   const {
     sups,
@@ -61,11 +116,31 @@ export default function App() {
     click,
     buyUpgrade,
   } = useGameState(sessionState || {});
-  const [successes, setSuccesses] = useState([]);
-  const [unlockedIds, setUnlockedIds] = useState([]);
-  const [popups, setPopups] = useState([]);
-  const [clickCount, setClickCount] = useState(0);
-  const [successesFetchError, setSuccessesFetchError] = useState(null);
+
+  const gameMetrics = {
+    totalSups,
+    sups,
+    supsPerClick,
+    supsPerSecond,
+    clickCount,
+    upgradesOwned: upgrades.reduce((acc, u) => acc + (u.owned || 0), 0),
+  };
+
+  const {
+    successes,
+    unlockedIds,
+    popups,
+    error: successesError,
+  } = useSuccesses(gameMetrics, {
+    enabled: Boolean(auth && sessionState),
+    resetKey:
+      auth?.userId ??
+      auth?.id ??
+      auth?._id ??
+      auth?.email ??
+      auth?.username ??
+      "guest",
+  });
 
   const currentRank = getCurrentRank(totalSups);
   const nextRank = getNextRank(totalSups);
@@ -100,26 +175,122 @@ export default function App() {
     saveUser(auth);
   }, [auth]);
 
+  const totalSupsRef = useRef(totalSups)
+  const supsPerSecondRef = useRef(supsPerSecond)
+  const supsPerClickRef = useRef(supsPerClick)
+  const supsRef = useRef(sups)
+  const upgradesRef = useRef(upgrades)
+
+  useEffect(() => {
+    totalSupsRef.current = totalSups
+  }, [totalSups])
+
+  useEffect(() => {
+    supsPerSecondRef.current = supsPerSecond
+  }, [supsPerSecond])
+
+  useEffect(() => {
+    supsPerClickRef.current = supsPerClick
+  }, [supsPerClick])
+
+  useEffect(() => {
+    supsRef.current = sups
+  }, [sups])
+
+  useEffect(() => {
+    upgradesRef.current = upgrades
+  }, [upgrades])
+
+  async function loadSession(token) {
+    setLoadingSession(true)
+    setSessionError(null)
   async function loadSession() {
     setLoadingSession(true);
     setSessionError(null);
 
+    const response = await getSession(token)
     const response = await getSession();
     if (response.ok) {
+      // fetch base batiments and user saved batiments
+      try {
+        const [baseResp, sessionBatimentsResp] = await Promise.all([
+          getUpgrade(),
+          getUpgradesBySession(token),
+        ])
+                if (baseResp.ok) {
+          const sessionData = mapSessionData(
+            response.data,
+            baseResp.data,
+            sessionBatimentsResp.ok ? sessionBatimentsResp.data : [], 
+          )                  // Nettoie les améliorations obsolètes en sauvegardant les améliorations filtrées
+          if (sessionBatimentsResp.ok && sessionData.filteredUserUpgrades) {
+            const obsoleteItems = (sessionBatimentsResp.data || []).filter(
+              (saved) => !baseResp.data.some((b) => String(b.id) === String(saved.batimentId))
+            )
+            
+            if (obsoleteItems.length > 0) {
+              // Des améliorations ont été supprimées, sauvegarde la liste filtrée
+              await saveUpgrades(sessionData.upgrades, token)
+            }
+          }
+          
+          setSessionState(sessionData)
+        } else {
+          setSessionState(mapSessionData(response.data))
+        }
+      } catch {
+        setSessionState(mapSessionData(response.data))
+      }
+      setLoadingSession(false)
+      return
       setSessionState(mapSessionData(response.data));
       setLoadingSession(false);
       return;
     }
 
     if (response.status === 404) {
+      const createResponse = await createSession(token)
       const createResponse = await createSession();
       if (!createResponse.ok && createResponse.status !== 201) {
         setSessionError("Impossible de créer la session de jeu.");
         setLoadingSession(false);
         return;
       }
+      const retry = await getSession(token)
       const retry = await getSession();
       if (retry.ok) {
+        try {
+          const [baseResp, sessionBatimentsResp] = await Promise.all([
+            getUpgrade(),
+            getUpgradesBySession(token),
+          ])
+
+          if (baseResp.ok) {
+            const sessionData = mapSessionData(
+              retry.data,
+              baseResp.data,
+              sessionBatimentsResp.ok ? sessionBatimentsResp.data : [],
+            )
+            
+            // Nettoie les améliorations obsolètes en sauvegardant les améliorations filtrées
+            if (sessionBatimentsResp.ok && sessionData.filteredUserUpgrades) {
+              const obsoleteItems = (sessionBatimentsResp.data || []).filter(
+                (saved) => !baseResp.data.some((b) => String(b.id) === String(saved.batimentId))
+              )
+              
+              if (obsoleteItems.length > 0) {
+                // Des améliorations ont été supprimées, sauvegarde la liste filtrée
+                await saveUpgrades(sessionData.upgrades, token)
+              }
+            }
+            
+            setSessionState(sessionData)
+          } else {
+            setSessionState(mapSessionData(retry.data))
+          }
+        } catch {
+          setSessionState(mapSessionData(retry.data))
+        }
         setSessionState(mapSessionData(retry.data));
       } else {
         setSessionState({
@@ -146,21 +317,45 @@ export default function App() {
   }
 
   useEffect(() => {
+    if (!auth) return
+    loadSession(auth.token)
+  }, [auth])
     if (!auth) return;
     loadSession();
   }, [auth]);
 
   useEffect(() => {
+    if (!auth?.token) return
+
+    let mounted = true
+
+    const saveAll = async () => {
     if (!auth) return;
     const timeout = setTimeout(async () => {
       try {
+        const clickBoosterCount = upgradesRef.current.reduce(
+          (sum, upgrade) => sum + (Number(upgrade.ordreAffichage) === 0 ? Number(upgrade.owned) : 0),
+          0,
+        )
+        await saveSession({ totalSups: totalSupsRef.current, supsPerSecond: supsPerSecondRef.current, supsPerClick: clickBoosterCount, sups: supsRef.current }, auth.token)
+        await saveUpgrades(upgradesRef.current, auth.token)
+        if (mounted) setSaveStatus('Sauvegardé automatiquement')
         await saveSession({ totalSups, supsPerSecond, supsPerClick });
         setSaveStatus("Sauvegardé automatiquement");
       } catch {
+        if (mounted) setSaveStatus('Erreur de sauvegarde')
         setSaveStatus("Erreur de sauvegarde");
       }
+    }
+
+    const interval = setInterval(saveAll, 5 * 60 * 1000)
     }, 2500);
 
+    return () => {
+      mounted = false
+      clearInterval(interval)
+    }
+  }, [auth?.token])
     return () => clearTimeout(timeout);
   }, [auth, totalSups, supsPerSecond, supsPerClick]);
 
@@ -173,6 +368,13 @@ export default function App() {
   async function handleManualSave() {
     if (!auth) return;
     try {
+      const clickBoosterCount = upgrades.reduce(
+        (sum, upgrade) => sum + (Number(upgrade.ordreAffichage) === 0 ? Number(upgrade.owned) : 0),
+        0,
+      )
+      await saveSession({ totalSups, supsPerSecond, supsPerClick: clickBoosterCount, sups }, auth.token)
+      await saveUpgrades(upgrades, auth.token)
+      setSaveStatus('Sauvegarde envoyée')
       await saveSession({ totalSups, supsPerSecond, supsPerClick });
       setSaveStatus("Sauvegarde envoyée");
     } catch {
@@ -235,6 +437,22 @@ export default function App() {
         <UpgradesList upgrades={upgrades} sups={sups} onBuy={buyUpgrade} />
       </main>
 
+      <aside className="debug-window" aria-label="Debug succes">
+        <div className="debug-window-title">Debug succes</div>
+        <div className="debug-window-row">
+          <span>Succes recuperes</span>
+          <strong>{successes.length}</strong>
+        </div>
+        <div className="debug-window-row">
+          <span>Succes reussis</span>
+          <strong>{unlockedIds.length}</strong>
+        </div>
+        {successesError ? (
+          <div className="debug-window-error">{successesError}</div>
+        ) : null}
+      </aside>
+
+      <AchievementPopup items={popups} />
       <Leaderboard />
     </>
   );

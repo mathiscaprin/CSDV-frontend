@@ -3,8 +3,8 @@ export const INITIAL_UPGRADES = [
   { id: 0, name: 'Doigt de développeur',     icon: '👆', baseCost: 10,          cpc: 1,    cps: 0,     owned: 1, growthRate: 1.5, desc: '+1 sup par clic' },
 
   // ── TIER 1 — premiers outils (déblocage ~30s) ────────────────────
-  { id: 1,  name: 'Café',            icon: '☕', baseCost: 15,           cpc: 0,    cps: 0.2,   owned: 0, desc: '+0.2 sup/sec' },
-  { id: 2,  name: 'Stack Overflow',  icon: '📋', baseCost: 100,          cpc: 0,    cps: 1,     owned: 0, desc: '+1 sup/sec' },
+  { id: 1,  name: 'Café',            icon: '☕', baseCost: 15,           cpc: 0,    cps: 1,   owned: 0, desc: '+0.2 sup/sec' },
+  { id: 2,  name: 'Stack Overflow',  icon: '📋', baseCost: 100,          cpc: 0,    cps: 3,     owned: 0, desc: '+1 sup/sec' },
   { id: 3,  name: 'ChatGPT',         icon: '🤖', baseCost: 500,          cpc: 0,    cps: 5,     owned: 0, desc: '+5 sups/sec' },
 
   // ── TIER 2 — langages (déblocage ~2-5 min) ───────────────────────
@@ -32,5 +32,7 @@ export const INITIAL_UPGRADES = [
 
 export function getUpgradeCost(upgrade) {
   const growthRate = upgrade.growthRate ?? 1.15
-  return Math.floor(upgrade.baseCost * Math.pow(growthRate, upgrade.owned))
+  const baseCost = upgrade.coutBase ?? upgrade.baseCost ?? 0
+  const owned = Number(upgrade.owned) || 0
+  return Math.floor(baseCost * Math.pow(growthRate, owned))
 }
