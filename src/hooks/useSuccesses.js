@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { getSuccesses, addSessionSuccesses } from "../utils/api.js";
 
 const LIST_KEYS = ["data", "successes", "succes", "items", "results"];
+const EMPTY_SUCCESSES = [];
+let successesRequest = null;
 const ID_KEYS = ["id", "_id", "uuid", "slug"];
 const NAME_KEYS = ["name", "nom", "title", "titre", "label", "libelle"];
 const DESCRIPTION_KEYS = ["description", "desc", "details", "detail"];
@@ -303,6 +305,16 @@ function mergeSuccesses(localSuccesses, fetchedSuccesses) {
   return merged;
 }
 
+function fetchSuccesses() {
+  if (!successesRequest) {
+    successesRequest = getSuccesses().finally(() => {
+      successesRequest = null;
+    });
+  }
+
+  return successesRequest;
+}
+
 function getMetricValue(metricName, gameMetrics) {
   const key = normalizeKey(metricName);
 
@@ -535,7 +547,7 @@ export function useSuccesses(
   gameMetrics,
   {
     enabled = true,
-    localSuccesses = [],
+    localSuccesses = EMPTY_SUCCESSES,
     resetKey = "default",
     sessionId,
     token,
@@ -566,9 +578,9 @@ export function useSuccesses(
 
     let ignore = false;
 
-    async function fetchSuccesses() {
+    async function loadSuccesses() {
       try {
-        const res = await getSuccesses();
+        const res = await fetchSuccesses();
         const list = extractSuccesses(res.data);
 
         if (ignore) return;
@@ -587,7 +599,7 @@ export function useSuccesses(
       }
     }
 
-    fetchSuccesses();
+    loadSuccesses();
 
     return () => {
       ignore = true;
