@@ -1,0 +1,216 @@
+.successes-page {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.successes-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.successes-header h1 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 2rem;
+  line-height: 1.1;
+  letter-spacing: 0;
+  text-shadow: 0 0 22px rgba(139, 92, 246, 0.42);
+}
+
+.successes-refresh {
+  appearance: none;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(167, 139, 250, 0.5);
+  border-radius: 50%;
+  background: rgba(139, 92, 246, 0.14);
+  color: #f8f8ff;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 1.3rem;
+  font-weight: 900;
+  line-height: 1;
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.successes-refresh:hover:not(:disabled) {
+  transform: rotate(18deg) scale(1.04);
+  border-color: rgba(250, 204, 21, 0.75);
+  background: rgba(250, 204, 21, 0.12);
+}
+
+.successes-refresh:disabled {
+  opacity: 0.48;
+  cursor: wait;
+}
+
+.successes-summary {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  min-height: 72px;
+  padding: 18px 20px;
+  border: 1px solid rgba(250, 204, 21, 0.26);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(250, 204, 21, 0.1), rgba(16, 185, 129, 0.08)),
+    rgba(255, 255, 255, 0.06);
+}
+
+.successes-summary-value {
+  color: #facc15;
+  font-size: 2.35rem;
+  line-height: 1;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+.successes-summary-label {
+  color: #f8f8ff;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+}
+
+.successes-state {
+  width: 100%;
+  padding: 22px 20px;
+  border: 1px solid rgba(167, 139, 250, 0.28);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(248, 248, 255, 0.82);
+  text-align: center;
+  font-weight: 700;
+}
+
+.successes-state--error {
+  border-color: rgba(248, 113, 113, 0.34);
+  background: rgba(248, 113, 113, 0.12);
+  color: #fee2e2;
+}
+
+.successes-list {
+  width: 100%;
+  list-style: none;
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+}
+
+.success-card {
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+  min-height: 82px;
+  padding: 16px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.18);
+}
+
+.success-card:focus-visible {
+  outline: 3px solid #a78bfa;
+  outline-offset: 2px;
+}
+
+.success-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(250, 204, 21, 0.42);
+  background: radial-gradient(circle at 35% 30%, #fef3c7, #facc15 42%, #a16207);
+  color: #2a1600;
+  font-size: 1.35rem;
+  font-weight: 900;
+  box-shadow: 0 0 22px rgba(250, 204, 21, 0.2);
+}
+
+.success-card-body {
+  min-width: 0;
+}
+
+.success-card-title {
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 900;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.success-card-desc,
+.success-card-condition {
+  margin-top: 5px;
+  color: rgba(248, 248, 255, 0.76);
+  font-size: 0.9rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.success-card-condition {
+  color: #bbf7d0;
+  font-weight: 700;
+}
+
+.success-card-date {
+  justify-self: end;
+  align-self: start;
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.14);
+  color: #bbf7d0;
+  font-size: 0.78rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+@media (max-width: 700px) {
+  .successes-header {
+    align-items: center;
+  }
+
+  .successes-header h1 {
+    font-size: 1.6rem;
+  }
+
+  .successes-summary {
+    min-height: 64px;
+    padding: 14px 16px;
+  }
+
+  .successes-summary-value {
+    font-size: 2rem;
+  }
+
+  .successes-summary-label {
+    font-size: 0.82rem;
+  }
+
+  .success-card {
+    grid-template-columns: 42px minmax(0, 1fr);
+    align-items: start;
+    padding: 14px;
+  }
+
+  .success-card-icon {
+    width: 42px;
+    height: 42px;
+    font-size: 1.15rem;
+  }
+
+  .success-card-date {
+    grid-column: 2;
+    justify-self: start;
+    margin-top: 2px;
+  }
+}

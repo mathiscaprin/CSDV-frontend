@@ -69,6 +69,38 @@
   gap: 10px;
 }
 
+.page-nav-btn {
+  appearance: none;
+  min-width: 104px;
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid rgba(250, 204, 21, 0.38);
+  border-radius: 999px;
+  background: rgba(250, 204, 21, 0.09);
+  color: #f8f8ff;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  gap: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.page-nav-btn:hover {
+  transform: scale(1.04);
+  background: rgba(250, 204, 21, 0.16);
+  box-shadow: 0 0 18px rgba(250, 204, 21, 0.22);
+}
+
+.page-nav-btn--active {
+  border-color: rgba(16, 185, 129, 0.5);
+  background: rgba(16, 185, 129, 0.12);
+}
+
 .mute-btn {
   appearance: none;
   width: 44px;
@@ -163,6 +195,7 @@
 }
 
 .save-btn:focus-visible,
+.page-nav-btn:focus-visible,
 .profile-btn:focus-visible {
   outline: 3px solid #a78bfa;
   outline-offset: 4px;
@@ -274,5 +307,23 @@
     width: 36px;
     height: 36px;
     font-size: 15px;
+  }
+
+  .page-nav-btn {
+    min-width: 36px;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border-radius: 50%;
+    font-size: 15px;
+  }
+
+  .page-nav-btn span:last-child {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
   }
 }

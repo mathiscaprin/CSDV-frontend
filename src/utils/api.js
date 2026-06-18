@@ -76,6 +76,13 @@ export async function getSuccesses() {
   });
 }
 
+export async function getSessionSuccesses(token) {
+  return request("/session/succes/", {
+    method: "GET",
+    token,
+  });
+}
+
 export async function getLeaderboard() {
   return request("/session/classement", {
     method: "GET",

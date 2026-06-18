@@ -8,6 +8,7 @@ import Confetti from "./components/Confetti/Confetti.jsx";
 import LoginPage from "./components/Auth/LoginPage.jsx";
 import Leaderboard from "./components/Leaderboard/Leaderboard.jsx";
 import AchievementPopup from "./components/Achievements/AchievementPopup.jsx";
+import SuccessesPage from "./components/Successes/SuccessesPage.jsx";
 import { useGameState } from "./hooks/useGameState.js";
 import { useSuccesses } from "./hooks/useSuccesses.js";
 import { useKeyboardSpeech } from "./hooks/useKeyboardSpeech.js";
@@ -113,6 +114,7 @@ export default function App() {
   const [autoSaveKey, setAutoSaveKey] = useState(0);
   const autoSaveClearRef = useRef(null);
   const [muted, setMuted] = useState(() => localStorage.getItem('sdv-muted') === 'true');
+  const [currentPage, setCurrentPage] = useState("game");
 
   function toggleMute() {
     setMuted((m) => {
@@ -407,6 +409,7 @@ export default function App() {
     setAuth(newAuth);
     setSessionState(null);
     setSaveStatus("");
+    setCurrentPage("game");
   }
 
   async function handleManualSave() {
@@ -434,6 +437,7 @@ export default function App() {
     setAuth(null);
     setSessionState(null);
     setSaveStatus("");
+    setCurrentPage("game");
     saveUser(null);
   }
 
@@ -463,22 +467,30 @@ export default function App() {
         saveStatus={saveStatus}
         muted={muted}
         onToggleMute={toggleMute}
+        currentPage={currentPage}
+        onNavigate={setCurrentPage}
       />
 
-      <main>
+      <main className={currentPage === "successes" ? "successes-main" : undefined}>
         {sessionError ? (
           <div className="session-error">{sessionError}</div>
         ) : null}
 
-        <Clicker onClick={click} muted={muted} />
+        {currentPage === "successes" ? (
+          <SuccessesPage token={auth?.token} />
+        ) : (
+          <>
+            <Clicker onClick={click} muted={muted} />
 
-        <ProgressBar
-          currentRank={currentRank}
-          nextRank={nextRank}
-          progress={progress}
-        />
+            <ProgressBar
+              currentRank={currentRank}
+              nextRank={nextRank}
+              progress={progress}
+            />
 
-        <UpgradesList upgrades={upgrades} sups={sups} onBuy={buyUpgrade} />
+            <UpgradesList upgrades={upgrades} sups={sups} onBuy={buyUpgrade} />
+          </>
+        )}
       </main>
 
       <AchievementPopup items={popups} />
