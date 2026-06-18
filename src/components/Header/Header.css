@@ -69,6 +69,32 @@
   gap: 10px;
 }
 
+.mute-btn {
+  appearance: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #1e1040, #3b1a6b);
+  border: 2px solid rgba(139, 92, 246, 0.5);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.mute-btn:hover {
+  transform: scale(1.06);
+  box-shadow: 0 0 18px rgba(139,92,246,0.45);
+}
+
+.mute-btn:focus-visible {
+  outline: 3px solid #a78bfa;
+  outline-offset: 4px;
+  border-radius: 50%;
+}
+
 .save-btn {
   appearance: none;
   width: 44px;
@@ -242,6 +268,7 @@
   .score-cps { font-size: 12px; }
 
   /* Boutons un peu plus petits */
+  .mute-btn,
   .save-btn,
   .profile-btn {
     width: 36px;

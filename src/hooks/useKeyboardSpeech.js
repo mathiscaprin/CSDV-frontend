@@ -1,8 +1,7 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
 function getLabel(el) {
   if (!el) return null
-  // Priorité : aria-label explicite > title > contenu textuel nettoyé
   const ariaLabel = el.getAttribute('aria-label')
   if (ariaLabel) return ariaLabel
   const title = el.getAttribute('title')
@@ -20,7 +19,13 @@ function speak(text) {
   window.speechSynthesis.speak(utterance)
 }
 
-export function useKeyboardSpeech() {
+export function useKeyboardSpeech(muted) {
+  const mutedRef = useRef(muted)
+
+  useEffect(() => {
+    mutedRef.current = muted
+  }, [muted])
+
   useEffect(() => {
     let isKeyboard = false
 
@@ -33,7 +38,7 @@ export function useKeyboardSpeech() {
     }
 
     function onFocusIn(e) {
-      if (!isKeyboard) return
+      if (!isKeyboard || mutedRef.current) return
       const label = getLabel(e.target)
       speak(label)
     }

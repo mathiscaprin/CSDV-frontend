@@ -5,7 +5,7 @@ import './Header.css'
 
 const SAVE_COOLDOWN = 5
 
-export default function Header({ sups, supsPerSecond, rankName, username, onLogout, onSave, saveStatus }) {
+export default function Header({ sups, supsPerSecond, rankName, username, onLogout, onSave, saveStatus, muted, onToggleMute }) {
   const [showCheck, setShowCheck] = useState(false)
   const [cooldown, setCooldown] = useState(0)
 
@@ -45,6 +45,14 @@ export default function Header({ sups, supsPerSecond, rankName, username, onLogo
       </div>
 
       <div className="header-actions">
+        <button
+          className="mute-btn"
+          onClick={onToggleMute}
+          aria-label={muted ? 'Activer les sons' : 'Couper les sons'}
+          title={muted ? 'Activer les sons' : 'Couper les sons'}
+        >
+          {muted ? '🔇' : '🔊'}
+        </button>
         <button
           className={`save-btn${disabled ? ' save-btn--disabled' : ''}`}
           onClick={handleSave}

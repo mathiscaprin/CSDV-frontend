@@ -112,8 +112,16 @@ export default function App() {
   const [autoSaveMsg, setAutoSaveMsg] = useState(null);
   const [autoSaveKey, setAutoSaveKey] = useState(0);
   const autoSaveClearRef = useRef(null);
+  const [muted, setMuted] = useState(() => localStorage.getItem('sdv-muted') === 'true');
 
-  useKeyboardSpeech();
+  function toggleMute() {
+    setMuted((m) => {
+      localStorage.setItem('sdv-muted', String(!m));
+      return !m;
+    });
+  }
+
+  useKeyboardSpeech(muted);
 
   useEffect(() => {
     function handleBackspace(e) {
@@ -382,12 +390,6 @@ export default function App() {
         setAutoSaveMsg("Sauvegarde automatique effectuée");
         setAutoSaveKey((k) => k + 1);
         autoSaveClearRef.current = setTimeout(() => setAutoSaveMsg(null), 3200);
-        window.speechSynthesis?.cancel();
-        window.speechSynthesis?.speak(
-          Object.assign(new SpeechSynthesisUtterance("Sauvegarde effectuée"), {
-            lang: "fr-FR",
-          }),
-        );
       } catch {
         if (mounted) setSaveStatus("Erreur de sauvegarde");
       }
@@ -422,12 +424,6 @@ export default function App() {
       );
       await saveUpgrades(upgrades, auth.token);
       setSaveStatus("Sauvegarde envoyée");
-      window.speechSynthesis?.cancel();
-      window.speechSynthesis?.speak(
-        Object.assign(new SpeechSynthesisUtterance("Sauvegarde effectuée"), {
-          lang: "fr-FR",
-        }),
-      );
     } catch {
       setSaveStatus("Erreur de sauvegarde");
     }
@@ -465,6 +461,8 @@ export default function App() {
         onLogout={handleLogout}
         onSave={handleManualSave}
         saveStatus={saveStatus}
+        muted={muted}
+        onToggleMute={toggleMute}
       />
 
       <main>
@@ -472,7 +470,7 @@ export default function App() {
           <div className="session-error">{sessionError}</div>
         ) : null}
 
-        <Clicker onClick={click} />
+        <Clicker onClick={click} muted={muted} />
 
         <ProgressBar
           currentRank={currentRank}
