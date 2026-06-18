@@ -20,6 +20,12 @@ main {
   gap: 36px;
 }
 
+main.successes-main {
+  max-width: 960px;
+  align-items: stretch;
+  gap: 22px;
+}
+
 .loading-screen {
   min-height: 100vh;
   display: flex;

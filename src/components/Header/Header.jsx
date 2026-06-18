@@ -5,7 +5,19 @@ import './Header.css'
 
 const SAVE_COOLDOWN = 5
 
-export default function Header({ sups, supsPerSecond, rankName, username, onLogout, onSave, saveStatus, muted, onToggleMute }) {
+export default function Header({
+  sups,
+  supsPerSecond,
+  rankName,
+  username,
+  onLogout,
+  onSave,
+  saveStatus,
+  muted,
+  onToggleMute,
+  currentPage,
+  onNavigate,
+}) {
   const [showCheck, setShowCheck] = useState(false)
   const [cooldown, setCooldown] = useState(0)
 
@@ -29,6 +41,7 @@ export default function Header({ sups, supsPerSecond, rankName, username, onLogo
   }
 
   const disabled = cooldown > 0
+  const isSuccessesPage = currentPage === 'successes'
 
   return (
     <header className="header">
@@ -45,6 +58,16 @@ export default function Header({ sups, supsPerSecond, rankName, username, onLogo
       </div>
 
       <div className="header-actions">
+        <button
+          className={`page-nav-btn${isSuccessesPage ? ' page-nav-btn--active' : ''}`}
+          onClick={() => onNavigate?.(isSuccessesPage ? 'game' : 'successes')}
+          aria-label={isSuccessesPage ? 'Retourner au jeu' : 'Voir les défis réalisés'}
+          title={isSuccessesPage ? 'Jeu' : 'Succès'}
+          type="button"
+        >
+          <span aria-hidden="true">{isSuccessesPage ? '🎓' : '🏆'}</span>
+          <span>{isSuccessesPage ? 'Jeu' : 'Succès'}</span>
+        </button>
         <button
           className="mute-btn"
           onClick={onToggleMute}
