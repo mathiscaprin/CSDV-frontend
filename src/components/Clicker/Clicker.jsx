@@ -39,7 +39,7 @@ function playPlop(audioCtxRef) {
   }
 }
 
-export default function Clicker({ onClick }) {
+export default function Clicker({ onClick, muted }) {
   const [floats, setFloats] = useState([])
   const logoRef = useRef(null)
   const clickTimestampsRef = useRef([])
@@ -62,7 +62,7 @@ export default function Clicker({ onClick }) {
 
   function handleClick(e) {
     if (isThrottled()) return
-    if (e.detail === 0 && e.type !== 'contextmenu') playPlop(audioCtxRef)
+    if (!muted && e.detail === 0 && e.type !== 'contextmenu') playPlop(audioCtxRef)
     const gained = onClick()
     pulse()
 
